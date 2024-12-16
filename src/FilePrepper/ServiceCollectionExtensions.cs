@@ -1,14 +1,13 @@
-﻿using FilePrepper;
+﻿using FilePrepper.Pipelines;
+using Microsoft.Extensions.DependencyInjection;
 
-#pragma warning disable IDE0130
-namespace Microsoft.Extensions.DependencyInjection;
-#pragma warning restore IDE0130
+namespace FilePrepper;
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFilePrepper(
-        this IServiceCollection services,
-        Action<FilePrepperOptions>? configureOptions = null)
+    this IServiceCollection services,
+    Action<FilePrepperOptions>? configureOptions = null)
     {
         var options = new FilePrepperOptions();
         configureOptions?.Invoke(options);
@@ -29,6 +28,11 @@ public static class ServiceCollectionExtensions
             .AsImplementedInterfaces()
             .WithTransientLifetime());
 
+        // CsvMergePipeline을 명시적으로 등록
+        services.AddTransient<CsvMergePipeline>();
+
         return services;
     }
+
+
 }

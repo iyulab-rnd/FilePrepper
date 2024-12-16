@@ -13,16 +13,28 @@ public class DataSanitizationPipeline : IConversionPipeline
     {
         _logger.LogInformation("Starting data sanitization pipeline");
 
-        // CSV 포맷을 위한 특수문자 및 구분자 처리
         var reader = new StreamReader(inputStream, options.OutputEncoding);
         var outputStream = new MemoryStream();
         var writer = new StreamWriter(outputStream, options.OutputEncoding, leaveOpen: true);
 
+        var uniqueRows = new HashSet<string>();
         string? line;
+        int lineNumber = 0;
+
         while ((line = await reader.ReadLineAsync()) != null)
         {
-            // 데이터 정제 작업
+            lineNumber++;
             line = SanitizeLine(line);
+
+            // Skip empty lines
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Skip duplicate rows (if header row, allow it once)
+            if (uniqueRows.Contains(line) && lineNumber > 1)
+                continue;
+
+            uniqueRows.Add(line);
             await writer.WriteLineAsync(line);
         }
 
@@ -33,14 +45,14 @@ public class DataSanitizationPipeline : IConversionPipeline
 
     private string SanitizeLine(string line)
     {
-        // 제어 문자 제거
+        // Remove control characters
         line = new string(line.Where(c => !char.IsControl(c) || c == '\t').ToArray());
 
-        // 앞뒤 공백 제거
+        // Trim leading/trailing spaces
         line = line.Trim();
 
-        // NULL 문자열 처리
-        line = line.Replace("NULL", "");
+        // Replace NULL or NaN with an empty string
+        line = line.Replace("NULL", "").Replace("NaN", "");
 
         return line;
     }

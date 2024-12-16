@@ -11,7 +11,6 @@
 	<PackageId>fileprepper-cli</PackageId>
 	<ToolCommandName>fileprepper</ToolCommandName>
 	<PackageOutputPath>./nupkg</PackageOutputPath>
-	<Version>0.1.0</Version>
   </PropertyGroup>
 	
   <ItemGroup>
