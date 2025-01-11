@@ -2,6 +2,9 @@
 
 public class MergeTask : BaseTask<MergeOption>
 {
+    // 모든 Merge 수행 후 최종 CSV를 출력할 때 사용할 헤더
+    private HashSet<string> _allHeaders = new();
+
     public MergeTask(
         MergeOption options,
         ILogger<MergeTask> logger,
@@ -16,7 +19,7 @@ public class MergeTask : BaseTask<MergeOption>
         // BaseTask의 context.InputPath는 무시하고,
         // MergeOption.InputPaths를 사용해 Merge 수행
 
-        var allRecords = new List<Dictionary<string, string>>();
+        List<Dictionary<string, string>> allRecords;
 
         if (Options.MergeType == MergeType.Vertical)
         {
@@ -38,7 +41,7 @@ public class MergeTask : BaseTask<MergeOption>
     private async Task<List<Dictionary<string, string>>> MergeVerticalAsync()
     {
         var allRecords = new List<Dictionary<string, string>>();
-        var allHeaders = new HashSet<string>();
+        _allHeaders = new HashSet<string>();
 
         // 모든 파일에 대해 CSV를 읽어 합치기
         foreach (var path in Options.InputPaths)
@@ -51,7 +54,7 @@ public class MergeTask : BaseTask<MergeOption>
             {
                 foreach (var header in newRecords[0].Keys)
                 {
-                    allHeaders.Add(header);
+                    _allHeaders.Add(header);
                 }
             }
         }
@@ -59,7 +62,7 @@ public class MergeTask : BaseTask<MergeOption>
         // 컬럼 수가 다른 CSV를 머지할 때, 부족한 컬럼은 빈 문자열로 채움
         foreach (var record in allRecords)
         {
-            foreach (var header in allHeaders)
+            foreach (var header in _allHeaders)
             {
                 if (!record.ContainsKey(header))
                 {
@@ -82,6 +85,9 @@ public class MergeTask : BaseTask<MergeOption>
         // 1) 일단 첫 번째 파일 읽기
         var mergedRecords = await ReadCsvFileAsync(Options.InputPaths[0]);
 
+        // allHeaders 초기화
+        _allHeaders = new HashSet<string>(mergedRecords.SelectMany(r => r.Keys));
+
         // 2) 두 번째 파일부터 차례로 Join
         for (int i = 1; i < Options.InputPaths.Count; i++)
         {
@@ -97,17 +103,17 @@ public class MergeTask : BaseTask<MergeOption>
         List<Dictionary<string, string>> rightRecords)
     {
         // Join에 등장하는 모든 컬럼(헤더)을 수집
-        var allHeaders = new HashSet<string>();
-        foreach (var rec in leftRecords)
-            foreach (var col in rec.Keys) allHeaders.Add(col);
         foreach (var rec in rightRecords)
-            foreach (var col in rec.Keys) allHeaders.Add(col);
+        {
+            foreach (var col in rec.Keys)
+                _allHeaders.Add(col);
+        }
 
-        // 모든 레코드가 allHeaders를 갖도록 보정
+        // 모든 레코드가 _allHeaders를 갖도록 보정
         // (없는 컬럼은 빈 문자열로 채움)
         foreach (var rec in leftRecords)
         {
-            foreach (var header in allHeaders)
+            foreach (var header in _allHeaders)
             {
                 if (!rec.ContainsKey(header))
                 {
@@ -117,7 +123,7 @@ public class MergeTask : BaseTask<MergeOption>
         }
         foreach (var rec in rightRecords)
         {
-            foreach (var header in allHeaders)
+            foreach (var header in _allHeaders)
             {
                 if (!rec.ContainsKey(header))
                 {
@@ -226,6 +232,15 @@ public class MergeTask : BaseTask<MergeOption>
                 .ToList();
         }
 
+        // [추가] JOIN 결과를 JoinKeyColumns[0] 기준으로 정렬 (테스트가 특정 순서를 기대할 경우)
+        if (Options.JoinKeyColumns.Count > 0)
+        {
+            var firstKey = Options.JoinKeyColumns[0];
+            joinResult = joinResult
+                .OrderBy(r => r[firstKey])  // 단순 문자열 정렬
+                .ToList();
+        }
+
         return joinResult;
     }
 
@@ -243,17 +258,31 @@ public class MergeTask : BaseTask<MergeOption>
         return true;
     }
 
+    /// <summary>
+    /// 왼쪽과 오른쪽 Dictionary를 합치되, 오른쪽 값이 빈 문자열이면 덮어쓰지 않고, 실제 값이 있으면 우선 적용
+    /// </summary>
     private Dictionary<string, string> MergeRow(
         Dictionary<string, string> left,
         Dictionary<string, string> right)
     {
-        // 왼쪽과 오른쪽을 합치되, 겹치는 컬럼은 오른쪽으로 overwrite할지?
-        // 여기서는 단순히 오른쪽을 우선하는 식으로 구현
+        // 기본적으로 왼쪽 복사
         var merged = new Dictionary<string, string>(left);
+
+        // 오른쪽 값이 비어있지 않을 때만 덮어쓰기
         foreach (var kv in right)
         {
-            merged[kv.Key] = kv.Value;
+            // 오른쪽 Value가 비어있지 않으면 overwrite
+            if (!string.IsNullOrEmpty(kv.Value))
+            {
+                merged[kv.Key] = kv.Value;
+            }
+            else if (!merged.ContainsKey(kv.Key))
+            {
+                // 혹시 왼쪽에도 없었던 컬럼이면 추가
+                merged[kv.Key] = string.Empty;
+            }
         }
+
         return merged;
     }
 
@@ -261,5 +290,23 @@ public class MergeTask : BaseTask<MergeOption>
     {
         // 이 Task에선 별도 최소 컬럼이 없으므로 비워둠
         return Enumerable.Empty<string>();
+    }
+
+    /// <summary>
+    /// 레코드가 없어도 헤더를 출력하기 위해 WriteOutputAsync를 오버라이드
+    /// </summary>
+    protected override async Task WriteOutputAsync(
+        string outputPath,
+        IEnumerable<string> headers,
+        IEnumerable<Dictionary<string, string>> records)
+    {
+        // 레코드가 하나도 없어도, _allHeaders를 써서 헤더를 출력
+        if (!headers.Any() && _allHeaders.Any())
+        {
+            headers = _allHeaders;
+        }
+
+        // 기본 베이스 로직 호출
+        await base.WriteOutputAsync(outputPath, headers, records);
     }
 }

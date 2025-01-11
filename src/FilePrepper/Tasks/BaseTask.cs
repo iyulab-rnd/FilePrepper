@@ -11,6 +11,8 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     public TOption Options { get; }
     ITaskOption ITask.Options => Options;
 
+    protected List<string> _originalHeaders = [];
+
     protected BaseTask(
         TOption options,
         ILogger logger,
@@ -40,22 +42,17 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
 
         try
         {
-            // 공통 전처리
             _logger.LogInformation("Reading input file: {InputPath}", context.InputPath);
             var records = await ReadAndPreProcessAsync(context);
 
             try
             {
-                // 실제 작업 수행 (파생 클래스에서 구현)
                 records = await ProcessRecordsAsync(records);
-
-                // 공통 후처리 및 저장
                 await PostProcessAndSaveAsync(records, context);
                 return true;
             }
             catch (Exception ex) when (Options.IgnoreErrors)
             {
-                // Warning 로그만 기록하고 계속 진행
                 _logger.LogWarning(ex, "Error ignored and continuing in {TaskName} task", Name);
                 await PostProcessAndSaveAsync(records, context);
                 return true;
@@ -76,32 +73,13 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     private async Task<List<Dictionary<string, string>>> ReadAndPreProcessAsync(TaskContext context)
     {
         _logger.LogInformation("Reading input file: {InputPath}", context.InputPath);
-        var records = await ReadCsvFileAsync(context.InputPath, GetRequiredColumns());
+        var (records, headers) = await ReadCsvFileAndHeadersAsync(context.InputPath, GetRequiredColumns());
+        _originalHeaders = headers;
         return await PreProcessRecordsAsync(records);
     }
 
-    protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
-        List<Dictionary<string, string>> records)
-    {
-        return Task.FromResult(records);
-    }
-
-    protected virtual Task<List<Dictionary<string, string>>> PostProcessRecordsAsync(
-        List<Dictionary<string, string>> records)
-    {
-        return Task.FromResult(records);
-    }
-
-    // 파생 클래스에서 구현할 메서드
-    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
-        List<Dictionary<string, string>> records);
-
-    protected virtual IEnumerable<string> GetRequiredColumns() =>
-        Options is IColumnOption columnOption ? columnOption.TargetColumns : Array.Empty<string>();
-
-    protected async Task<List<Dictionary<string, string>>> ReadCsvFileAsync(
-        string filePath,
-        IEnumerable<string>? requiredColumns = null)
+    private async Task<(List<Dictionary<string, string>> Records, List<string> Headers)>
+        ReadCsvFileAndHeadersAsync(string filePath, IEnumerable<string>? requiredColumns = null)
     {
         var records = new List<Dictionary<string, string>>();
         var csvConfig = CsvUtils.GetDefaultConfiguration();
@@ -133,29 +111,60 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
             records.Add(record);
         }
 
+        return (records, headers);
+    }
+
+    protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        return Task.FromResult(records);
+    }
+
+    protected virtual Task<List<Dictionary<string, string>>> PostProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        return Task.FromResult(records);
+    }
+
+    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+        List<Dictionary<string, string>> records);
+
+    protected virtual IEnumerable<string> GetRequiredColumns() =>
+        Options is IColumnOption columnOption ? columnOption.TargetColumns : Array.Empty<string>();
+
+    protected async Task<List<Dictionary<string, string>>> ReadCsvFileAsync(
+        string filePath,
+        IEnumerable<string>? requiredColumns = null)
+    {
+        var (records, _) = await ReadCsvFileAndHeadersAsync(filePath, requiredColumns);
         return records;
     }
 
     protected virtual async Task WriteOutputAsync(
-    string outputPath,
-    IEnumerable<string> headers,
-    IEnumerable<Dictionary<string, string>> records)
+        string outputPath,
+        IEnumerable<string> headers,
+        IEnumerable<Dictionary<string, string>> records)
     {
-        // 기본 구현은 현재 CSV 저장 로직
+        var finalHeaders = headers.Any() ? headers : _originalHeaders;
+        if (!finalHeaders.Any())
+        {
+            finalHeaders = new[] { "NoData" };
+        }
+
         await using var writer = new StreamWriter(outputPath);
         await using var csv = new CsvWriter(writer, CsvUtils.GetDefaultConfiguration());
 
         // Write headers
-        foreach (var header in headers)
+        foreach (var header in finalHeaders)
         {
             csv.WriteField(header);
         }
         csv.NextRecord();
 
-        // Write data
+        // Write data rows
         foreach (var record in records)
         {
-            foreach (var header in headers)
+            foreach (var header in finalHeaders)
             {
                 csv.WriteField(record.GetValueOrDefault(header, string.Empty));
             }

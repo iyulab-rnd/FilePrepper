@@ -1,12 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FilePrepper.Tasks;
 
-namespace FilePrepper.Tasks.ReorderColumns
+namespace FilePrepper.Tasks.ReorderColumns;
+
+public class ReorderColumnsOption : BaseOption
 {
-    public class ReorderColumnsOption
+    /// <summary>
+    /// Desired column order.
+    /// </summary>
+    public List<string> Order { get; set; } = new();
+
+    protected override string[] ValidateInternal()
     {
+        var errors = new List<string>();
+        if (Order == null || Order.Count == 0)
+        {
+            errors.Add("At least one column must be specified for reordering.");
+        }
+        foreach (var col in Order)
+        {
+            if (string.IsNullOrWhiteSpace(col))
+            {
+                errors.Add("Column name in order cannot be empty or whitespace.");
+            }
+        }
+        return errors.ToArray();
     }
 }

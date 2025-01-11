@@ -1,4 +1,5 @@
 ﻿using CsvHelper.Configuration;
+
 namespace FilePrepper.Utils;
 
 public static class CsvUtils
@@ -28,13 +29,20 @@ public static class CsvUtils
         return errors;
     }
 
-    public static bool TryParseNumeric(string value, out double result)
+    /// <summary>
+    /// Parse string to double, but reject NaN/Infinity as invalid
+    /// </summary>
+    public static bool TryParseNumeric(string? input, out double value)
     {
-        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+        if (double.TryParse(input, out value))
         {
+            // If parsed but is NaN or Infinity, treat as invalid
+            if (double.IsNaN(value) || double.IsInfinity(value))
+            {
+                return false;
+            }
             return true;
         }
-        result = 0;
         return false;
     }
 
@@ -72,4 +80,6 @@ public static class CsvUtils
         }
         return result;
     }
+
+
 }

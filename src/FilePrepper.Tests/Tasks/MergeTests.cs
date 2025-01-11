@@ -125,7 +125,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
 
         // 첫 번째 파일 (Score 컬럼), 두 번째 파일 (Age 컬럼)이 각각 존재해야 함
         // 1번째 CSV 행: Age 컬럼은 빈 문자열, 2번째 CSV 행: Score 컬럼은 빈 문자열
-        Assert.Contains("1,John,85,,", lines[1]); // Age 자리에 공백
+        Assert.Contains("1,John,85,", lines[1]);
         Assert.Contains("3,Mary,,25", lines[3]);  // Score 자리에 공백
     }
 

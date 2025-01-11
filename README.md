@@ -15,7 +15,6 @@
 | | FilterRows | 행 필터링 |
 | | ValueReplace | 값 대체/변환 |
 | **데이터 변환** | DataTypeConvert | 데이터 타입 변환 |
-| | ParseDate | 날짜 형식 파싱 |
 | | DateExtraction | 날짜 컴포넌트 추출 |
 | | OneHotEncoding | 원-핫 인코딩 |
 | **데이터 스케일링** | NormalizeData | 데이터 정규화 |

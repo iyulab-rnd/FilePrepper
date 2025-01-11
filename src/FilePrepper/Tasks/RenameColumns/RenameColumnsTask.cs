@@ -1,12 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.RenameColumns;
 
-namespace FilePrepper.Tasks.RenameColumns
+public class RenameColumnsTask : BaseTask<RenameColumnsOption>
 {
-    public class RenameColumnsTask
+    public RenameColumnsTask(
+        RenameColumnsOption options,
+        ILogger<RenameColumnsTask> logger,
+        ILogger<RenameColumnsValidator> validatorLogger)
+        : base(options, logger, new RenameColumnsValidator(validatorLogger))
     {
+    }
+
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        _logger.LogInformation("Renaming specified columns in records");
+
+        var renameMap = Options.RenameMap;
+        // 원본 헤더 순서를 보존하기 위해 복사본 생성
+        var oldHeadersCopy = new List<string>(_originalHeaders);
+        var newHeaderOrder = new List<string>();
+        foreach (var col in oldHeadersCopy)
+        {
+            newHeaderOrder.Add(renameMap.ContainsKey(col) ? renameMap[col] : col);
+        }
+        // 출력용 헤더 순서 업데이트
+        _originalHeaders = newHeaderOrder;
+
+        // 각 레코드에서 열 이름 변경 (순서 보존)
+        foreach (var record in records)
+        {
+            var newRecord = new Dictionary<string, string>();
+            foreach (var col in oldHeadersCopy)
+            {
+                string newColName = renameMap.ContainsKey(col) ? renameMap[col] : col;
+                if (record.ContainsKey(col))
+                {
+                    newRecord[newColName] = record[col];
+                }
+                else
+                {
+                    newRecord[newColName] = string.Empty;
+                }
+            }
+            record.Clear();
+            foreach (var kv in newRecord)
+            {
+                record[kv.Key] = kv.Value;
+            }
+        }
+
+        return Task.FromResult(records);
     }
 }

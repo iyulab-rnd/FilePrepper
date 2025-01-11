@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.OneHotEncoding;
 
-namespace FilePrepper.Tasks.OneHotEncoding
+public class OneHotEncodingValidator : BaseValidator<OneHotEncodingOption>
 {
-    public class OneHotEncodingValidator
+    public OneHotEncodingValidator(ILogger<OneHotEncodingValidator> logger) : base(logger)
     {
+    }
+
+    protected override string[] ValidateSpecific(OneHotEncodingOption option)
+    {
+        // BaseValidator calls ValidateCommon -> ValidateSpecific.
+        // If we had additional checks beyond what's in OneHotEncodingOption.ValidateInternal(),
+        // we would place them here.
+        return Array.Empty<string>();
     }
 }

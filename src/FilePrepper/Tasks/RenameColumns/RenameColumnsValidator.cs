@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.RenameColumns;
 
-namespace FilePrepper.Tasks.RenameColumns
+public class RenameColumnsValidator : BaseValidator<RenameColumnsOption>
 {
-    public class RenameColumnsValidator
+    public RenameColumnsValidator(ILogger<RenameColumnsValidator> logger) : base(logger)
     {
+    }
+
+    protected override string[] ValidateSpecific(RenameColumnsOption option)
+    {
+        return Array.Empty<string>();
     }
 }
