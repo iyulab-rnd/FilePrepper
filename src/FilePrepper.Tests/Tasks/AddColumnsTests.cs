@@ -1,30 +1,15 @@
-﻿using Xunit;
-using FilePrepper.Tasks.AddColumns;
+﻿using FilePrepper.Tasks.AddColumns;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class AddColumnsTests : IDisposable
+public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<AddColumnsTask>> _mockLogger = new();
-    private readonly Mock<ILogger<AddColumnsValidator>> _mockValidatorLogger = new();
-
-    public AddColumnsTests()
+    public AddColumnsTests(ITestOutputHelper output) : base(output)
     {
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath, "Id,Name\n1,John\n2,Jane");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
-
-        GC.SuppressFinalize(this);
     }
 
     [Fact]

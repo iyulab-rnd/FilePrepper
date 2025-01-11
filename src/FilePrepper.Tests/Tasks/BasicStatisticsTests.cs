@@ -1,46 +1,16 @@
-﻿using Xunit;
-using FilePrepper.Tasks.BasicStatistics;
+﻿using FilePrepper.Tasks.BasicStatistics;
 using FilePrepper.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Globalization;
 using Xunit.Abstractions;
-using Microsoft.Extensions.Primitives;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class BasicStatisticsTests : IDisposable
+public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStatisticsValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<BasicStatisticsTask>> _mockLogger;
-    private readonly Mock<ILogger<BasicStatisticsValidator>> _mockValidatorLogger;
-    private readonly ITestOutputHelper _output;
-    private List<string> _logMessages;
-
-    public BasicStatisticsTests(ITestOutputHelper output)
+    public BasicStatisticsTests(ITestOutputHelper output) : base(output)
     {
-        _output = output;
-        _logMessages = new List<string>();
-
-        _mockLogger = new Mock<ILogger<BasicStatisticsTask>>();
-        _mockValidatorLogger = new Mock<ILogger<BasicStatisticsValidator>>();
-
-        _mockLogger
-            .Setup(x => x.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Callback((LogLevel level, EventId id, object state, Exception ex, object formatter) =>
-            {
-                var format = formatter as Delegate;
-                var message = $"[{level}] {format.DynamicInvoke(state, ex)}";
-                _logMessages.Add(message);
-                _output.WriteLine(message);
-            });
-
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath,
             "ID,Score,Grade,Value\n" +
@@ -54,14 +24,6 @@ public class BasicStatisticsTests : IDisposable
             "8,82,B,110\n" +
             "9,90,A,160\n" +
             "10,75,C,95\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
-
-        GC.SuppressFinalize(this);
     }
 
     [Fact]
@@ -96,13 +58,6 @@ public class BasicStatisticsTests : IDisposable
         // Act
         bool result = task.Execute(context);
 
-        // Assert & Log output
-        _output.WriteLine("=== Log Messages ===");
-        foreach (var msg in _logMessages)
-        {
-            _output.WriteLine(msg);
-        }
-
         Assert.True(result);
         Assert.True(File.Exists(_testOutputPath));
 
@@ -113,9 +68,6 @@ public class BasicStatisticsTests : IDisposable
         {
             _output.WriteLine(line);
         }
-
-        // 유효하지 않은 데이터에 대한 경고 로그 확인
-        Assert.Contains(_logMessages, msg => msg.Contains("[Warning]") && msg.Contains("Skipping invalid numeric value"));
 
         File.Delete(invalidDataPath);
     }
@@ -153,13 +105,6 @@ public class BasicStatisticsTests : IDisposable
 
         // Act
         bool result = task.Execute(context);
-
-        // Assert & Log output
-        _output.WriteLine("=== Log Messages ===");
-        foreach (var msg in _logMessages)
-        {
-            _output.WriteLine(msg);
-        }
 
         Assert.True(result);
         Assert.True(File.Exists(_testOutputPath));

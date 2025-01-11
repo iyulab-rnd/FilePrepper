@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
 
-namespace FilePrepper.Tasks.FileFormatConvert
+namespace FilePrepper.Tasks.FileFormatConvert;
+
+public class FileFormatConvertValidator : BaseValidator<FileFormatConvertOption>
 {
-    public class FileFormatConvertValidator
+    public FileFormatConvertValidator(ILogger<FileFormatConvertValidator> logger)
+        : base(logger)
     {
     }
 }

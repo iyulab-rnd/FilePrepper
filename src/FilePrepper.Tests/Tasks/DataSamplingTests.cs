@@ -1,20 +1,12 @@
-﻿
-using Xunit;
-using FilePrepper.Tasks.DataSampling;
+﻿using FilePrepper.Tasks.DataSampling;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DataSamplingTests : IDisposable
+public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<DataSamplingTask>> _mockLogger = new();
-    private readonly Mock<ILogger<DataSamplingValidator>> _mockValidatorLogger = new();
-
-    public DataSamplingTests()
+    public DataSamplingTests(ITestOutputHelper output) : base(output)
     {
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath,
@@ -29,12 +21,6 @@ public class DataSamplingTests : IDisposable
             "8,B,800\n" +
             "9,C,900\n" +
             "10,A,1000\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
     }
 
     [Fact]

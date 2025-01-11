@@ -1,20 +1,15 @@
-﻿using Xunit;
-using FilePrepper.Tasks.DateExtraction;
+﻿using FilePrepper.Tasks.DateExtraction;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Globalization;
 using FilePrepper.Tasks;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DateExtractionTests : IDisposable
+public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtractionValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<DateExtractionTask>> _mockLogger = new();
-    private readonly Mock<ILogger<DateExtractionValidator>> _mockValidatorLogger = new();
-
-    public DateExtractionTests()
+    public DateExtractionTests(ITestOutputHelper output) : base(output)
     {
         // Create test input file
         File.WriteAllText(_testInputPath,
@@ -22,13 +17,6 @@ public class DateExtractionTests : IDisposable
             "2024-01-10 15:30:45\n" +
             "2024-02-20 08:15:30\n" +
             "2024-03-30 12:45:20\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
-        GC.SuppressFinalize(this);
     }
 
     [Fact]

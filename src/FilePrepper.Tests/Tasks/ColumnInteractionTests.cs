@@ -1,21 +1,13 @@
-﻿
-using Xunit;
-using FilePrepper.Tasks.ColumnInteraction;
+﻿using FilePrepper.Tasks.ColumnInteraction;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class ColumnInteractionTests : IDisposable
+public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, ColumnInteractionValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<ColumnInteractionTask>> _mockLogger = new();
-    private readonly Mock<ILogger<ColumnInteractionValidator>> _mockValidatorLogger = new();
-
-    public ColumnInteractionTests()
+    public ColumnInteractionTests(ITestOutputHelper output) : base(output)
     {
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath,
@@ -23,14 +15,6 @@ public class ColumnInteractionTests : IDisposable
             "10,20,30,Hello,World\n" +
             "15,25,35,Good,Morning\n" +
             "5,15,25,Test,Data\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
-
-        GC.SuppressFinalize(this);
     }
 
     [Theory]

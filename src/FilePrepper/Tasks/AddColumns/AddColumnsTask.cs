@@ -12,7 +12,7 @@ public class AddColumnsTask : BaseTask<AddColumnsOption>
     {
     }
 
-    protected override async Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
         // 헤더 검증
@@ -36,6 +36,6 @@ public class AddColumnsTask : BaseTask<AddColumnsOption>
             }
         }
 
-        return records;
+        return Task.FromResult(records);
     }
 }

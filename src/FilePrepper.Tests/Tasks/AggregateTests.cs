@@ -1,18 +1,12 @@
 ﻿using FilePrepper.Tasks.Aggregate;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class AggregateTests : IDisposable
+public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<AggregateTask>> _mockLogger = new();
-    private readonly Mock<ILogger<AggregateValidator>> _mockValidatorLogger = new();
-
-    public AggregateTests()
+    public AggregateTests(ITestOutputHelper output) : base(output)
     {
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath,
@@ -22,12 +16,6 @@ public class AggregateTests : IDisposable
             "South,A,200\n" +
             "South,B,300\n" +
             "North,B,250\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
     }
 
     [Fact]

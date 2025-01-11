@@ -27,4 +27,8 @@ public class ValidationException : Exception
     {
         this.Code = code;
     }
+
+    public ValidationException(string? message) : base(message)
+    {
+    }
 }

@@ -13,7 +13,7 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
     {
     }
 
-    protected override async Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
         var processedRecords = new List<Dictionary<string, string>>();
@@ -50,7 +50,7 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
             processedRecords.Add(newRecord);
         }
 
-        return processedRecords;
+        return Task.FromResult(processedRecords);
     }
 
     private void ProcessDateExtraction(Dictionary<string, string> record, DateColumnExtraction extraction)

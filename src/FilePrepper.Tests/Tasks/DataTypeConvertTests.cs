@@ -1,20 +1,13 @@
-﻿using Xunit;
-using FilePrepper.Tasks.DataTypeConvert;
+﻿using FilePrepper.Tasks.DataTypeConvert;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
-using Moq;
 using System.Globalization;
+using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DataTypeConvertTests : IDisposable
+public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeConvertValidator>
 {
-    private readonly string _testInputPath = Path.GetTempFileName();
-    private readonly string _testOutputPath = Path.GetTempFileName();
-    private readonly Mock<ILogger<DataTypeConvertTask>> _mockLogger = new();
-    private readonly Mock<ILogger<DataTypeConvertValidator>> _mockValidatorLogger = new();
-
-    public DataTypeConvertTests()
+    public DataTypeConvertTests(ITestOutputHelper output) : base(output)
     {
         // 테스트 입력 파일 생성
         File.WriteAllText(_testInputPath,
@@ -22,14 +15,6 @@ public class DataTypeConvertTests : IDisposable
             "123,123.45,2024-01-10,true,Hello\n" +
             "456,456.78,2024-02-20,false,World\n" +
             "789,789.12,2024-03-30,yes,Test\n");
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(_testInputPath)) File.Delete(_testInputPath);
-        if (File.Exists(_testOutputPath)) File.Delete(_testOutputPath);
-
-        GC.SuppressFinalize(this);
     }
 
     [Fact]

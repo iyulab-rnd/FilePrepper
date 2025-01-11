@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
 
-namespace FilePrepper.Tasks.FillMissingValues
+namespace FilePrepper.Tasks.FillMissingValues;
+
+public class FillMissingValuesValidator : BaseValidator<FillMissingValuesOption>
 {
-    public class FillMissingValuesValidator
+    public FillMissingValuesValidator(ILogger<FillMissingValuesValidator> logger)
+        : base(logger)
     {
     }
 }

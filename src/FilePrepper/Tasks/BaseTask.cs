@@ -82,19 +82,6 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         return await PreProcessRecordsAsync(records);
     }
 
-    private async Task PostProcessAndSaveAsync(
-        List<Dictionary<string, string>> records,
-        TaskContext context)
-    {
-        records = await PostProcessRecordsAsync(records);
-
-        _logger.LogInformation("Writing output file: {OutputPath}", context.OutputPath);
-        var headers = records.FirstOrDefault()?.Keys ?? Enumerable.Empty<string>();
-        await WriteCsvFileAsync(context.OutputPath, headers, records);
-
-        _logger.LogInformation("Task completed successfully");
-    }
-
     protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
@@ -151,31 +138,43 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         return records;
     }
 
-    protected async Task WriteCsvFileAsync(
-        string filePath,
-        IEnumerable<string> headers,
-        IEnumerable<Dictionary<string, string>> records)
+    protected virtual async Task WriteOutputAsync(
+    string outputPath,
+    IEnumerable<string> headers,
+    IEnumerable<Dictionary<string, string>> records)
     {
-        var csvConfig = CsvUtils.GetDefaultConfiguration();
-
-        using var writer = new StreamWriter(filePath);
-        using var csvWriter = new CsvWriter(writer, csvConfig);
+        // 기본 구현은 현재 CSV 저장 로직
+        await using var writer = new StreamWriter(outputPath);
+        await using var csv = new CsvWriter(writer, CsvUtils.GetDefaultConfiguration());
 
         // Write headers
         foreach (var header in headers)
         {
-            csvWriter.WriteField(header);
+            csv.WriteField(header);
         }
-        await csvWriter.NextRecordAsync();
+        csv.NextRecord();
 
         // Write data
         foreach (var record in records)
         {
             foreach (var header in headers)
             {
-                csvWriter.WriteField(record.GetValueOrDefault(header, string.Empty));
+                csv.WriteField(record.GetValueOrDefault(header, string.Empty));
             }
-            await csvWriter.NextRecordAsync();
+            csv.NextRecord();
         }
+    }
+
+    private async Task PostProcessAndSaveAsync(
+        List<Dictionary<string, string>> records,
+        TaskContext context)
+    {
+        records = await PostProcessRecordsAsync(records);
+        _logger.LogInformation("Writing output file: {OutputPath}", context.OutputPath);
+
+        var headers = records.FirstOrDefault()?.Keys ?? Enumerable.Empty<string>();
+        await WriteOutputAsync(context.OutputPath!, headers, records);
+
+        _logger.LogInformation("Task completed successfully");
     }
 }
