@@ -1,8 +1,4 @@
-﻿using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-using System.Globalization;
-
-namespace FilePrepper.Tasks.Aggregate;
+﻿namespace FilePrepper.Tasks.Aggregate;
 
 public class AggregateTask : BaseTask<AggregateOption>
 {

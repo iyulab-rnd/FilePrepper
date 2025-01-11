@@ -1,6 +1,4 @@
 ﻿using CsvHelper.Configuration;
-using System.Globalization;
-
 namespace FilePrepper.Utils;
 
 public static class CsvUtils

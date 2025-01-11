@@ -1,9 +1,9 @@
 ﻿using FilePrepper.Tasks.DateExtraction;
-using Microsoft.Extensions.Logging;
 using Moq;
-using System.Globalization;
 using FilePrepper.Tasks;
 using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace FilePrepper.Tests.Tasks;
 

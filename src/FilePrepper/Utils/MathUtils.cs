@@ -1,8 +1,4 @@
-﻿// Utils/MathUtils.cs
-using System.Collections.Generic;
-using System.Linq;
-
-namespace FilePrepper.Utils;
+﻿namespace FilePrepper.Utils;
 
 public static class MathUtils
 {

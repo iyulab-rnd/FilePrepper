@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.FillMissingValues;
+﻿namespace FilePrepper.Tasks.FillMissingValues;
 
 public class FillMissingValuesValidator : BaseValidator<FillMissingValuesOption>
 {

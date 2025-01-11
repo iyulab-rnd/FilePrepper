@@ -1,6 +1,4 @@
-﻿using FilePrepper.Utils;
-
-namespace FilePrepper.Tasks;
+﻿namespace FilePrepper.Tasks;
 
 // Extension methods for common CSV operations
 public static class CsvTaskExtensions

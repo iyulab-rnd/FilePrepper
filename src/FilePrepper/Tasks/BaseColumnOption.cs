@@ -1,6 +1,4 @@
-﻿using FilePrepper.Utils;
-
-namespace FilePrepper.Tasks;
+﻿namespace FilePrepper.Tasks;
 
 public abstract class BaseColumnOption : BaseOption, IColumnOption
 {

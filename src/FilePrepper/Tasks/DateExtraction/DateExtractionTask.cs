@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Globalization;
-
-namespace FilePrepper.Tasks.DateExtraction;
+﻿namespace FilePrepper.Tasks.DateExtraction;
 
 public class DateExtractionTask : BaseTask<DateExtractionOption>
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.DataSampling;
+﻿namespace FilePrepper.Tasks.DataSampling;
 
 public enum SamplingMethod
 {

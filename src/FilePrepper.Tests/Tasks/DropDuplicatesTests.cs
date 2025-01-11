@@ -1,5 +1,4 @@
 ﻿using FilePrepper.Tasks.DropDuplicates;
-using Microsoft.Extensions.Logging;
 using Moq;
 using FilePrepper.Tasks;
 using Xunit.Abstractions;

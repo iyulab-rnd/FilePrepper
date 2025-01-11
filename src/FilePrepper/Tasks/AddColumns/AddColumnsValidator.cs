@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.AddColumns;
+﻿namespace FilePrepper.Tasks.AddColumns;
 
 public class AddColumnsValidator : BaseValidator<AddColumnsOption>
 {

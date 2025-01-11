@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.ColumnInteraction;
+﻿namespace FilePrepper.Tasks.ColumnInteraction;
 
 
 public class ColumnInteractionValidator : BaseValidator<ColumnInteractionOption>

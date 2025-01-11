@@ -1,9 +1,6 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Xml.Linq;
 using CsvHelper;
-using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tasks.FileFormatConvert;
 

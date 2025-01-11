@@ -1,7 +1,7 @@
 ﻿using FilePrepper.Tasks.ColumnInteraction;
 using FilePrepper.Tasks;
-using System.Globalization;
 using Xunit.Abstractions;
+using System.Globalization;
 
 namespace FilePrepper.Tests.Tasks;
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.BasicStatistics;
+﻿namespace FilePrepper.Tasks.BasicStatistics;
 
 public class BasicStatisticsValidator : BaseValidator<BasicStatisticsOption>
 {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.FileFormatConvert;
+﻿namespace FilePrepper.Tasks.FileFormatConvert;
 
 public class FileFormatConvertValidator : BaseValidator<FileFormatConvertOption>
 {

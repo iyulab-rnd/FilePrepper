@@ -1,7 +1,6 @@
 ﻿using Xunit.Abstractions;
 using FilePrepper.Tasks.FileFormatConvert;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
 using Moq;
 using System.Text;
 using System.Text.Json;

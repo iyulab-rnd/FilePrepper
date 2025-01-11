@@ -1,8 +1,4 @@
-﻿using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-using System.Globalization;
-
-namespace FilePrepper.Tasks.BasicStatistics;
+﻿namespace FilePrepper.Tasks.BasicStatistics;
 
 public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
 {

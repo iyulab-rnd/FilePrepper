@@ -1,7 +1,4 @@
-﻿using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.Aggregate;
+﻿namespace FilePrepper.Tasks.Aggregate;
 
 public enum AggregateFunction
 {

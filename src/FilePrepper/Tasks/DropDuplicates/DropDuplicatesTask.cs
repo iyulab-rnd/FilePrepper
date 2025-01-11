@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.DropDuplicates;
+﻿namespace FilePrepper.Tasks.DropDuplicates;
 
 
 public class DropDuplicatesTask : BaseTask<DropDuplicatesOption>

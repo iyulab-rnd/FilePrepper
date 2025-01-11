@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Utils;
+﻿namespace FilePrepper.Utils;
 
 public static class ValidationUtils
 {

@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace FilePrepper.Tasks.DateExtraction;
+﻿namespace FilePrepper.Tasks.DateExtraction;
 
 public enum DateComponent
 {

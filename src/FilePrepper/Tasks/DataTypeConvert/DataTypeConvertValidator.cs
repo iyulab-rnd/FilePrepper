@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.DataTypeConvert;
+﻿namespace FilePrepper.Tasks.DataTypeConvert;
 
 public class DataTypeConvertValidator : BaseValidator<DataTypeConvertOption>
 {

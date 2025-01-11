@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.Aggregate;
+﻿namespace FilePrepper.Tasks.Aggregate;
 
 public class AggregateValidator : BaseValidator<AggregateOption>
 {

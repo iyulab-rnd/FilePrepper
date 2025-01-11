@@ -1,10 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-using System.Globalization;
-
-namespace FilePrepper.Tasks.DataTypeConvert;
+﻿namespace FilePrepper.Tasks.DataTypeConvert;
 
 public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
 {

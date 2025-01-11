@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace FilePrepper.Tasks.DataTypeConvert;
+﻿namespace FilePrepper.Tasks.DataTypeConvert;
 
 public enum DataType
 {

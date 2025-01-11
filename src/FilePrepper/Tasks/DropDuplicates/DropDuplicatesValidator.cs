@@ -1,7 +1,4 @@
-﻿using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.DropDuplicates;
+﻿namespace FilePrepper.Tasks.DropDuplicates;
 
 public class DropDuplicatesValidator : BaseValidator<DropDuplicatesOption>
 {

@@ -1,7 +1,4 @@
-﻿using FilePrepper.Utils;
-using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks;
+﻿namespace FilePrepper.Tasks;
 
 public abstract class BaseValidator<TOption> : IOptionValidator where TOption : BaseOption
 {

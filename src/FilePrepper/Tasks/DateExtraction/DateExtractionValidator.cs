@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace FilePrepper.Tasks.DateExtraction;
+﻿namespace FilePrepper.Tasks.DateExtraction;
 
 public class DateExtractionValidator : BaseValidator<DateExtractionOption>
 {

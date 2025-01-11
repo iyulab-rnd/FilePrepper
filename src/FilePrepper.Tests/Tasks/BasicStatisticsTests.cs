@@ -1,9 +1,9 @@
 ﻿using FilePrepper.Tasks.BasicStatistics;
 using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
 using Moq;
-using System.Globalization;
 using Xunit.Abstractions;
+using System.Globalization;
+using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tests.Tasks;
 

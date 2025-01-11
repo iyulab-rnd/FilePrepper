@@ -28,11 +28,11 @@
 
 ## Dependency Packages
 ```
-    <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <PackageReference Include="EPPlus" Version="7.5.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
-    <PackageReference Include="Scrutor" Version="5.0.2" />
+<PackageReference Include="CsvHelper" Version="33.0.1" />
+<PackageReference Include="EPPlus" Version="7.5.2" />
+<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+<PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
+<PackageReference Include="Scrutor" Version="5.1.1" />
 ```
 

@@ -1,7 +1,4 @@
-﻿using FilePrepper.Utils;
-using System.Text;
-
-namespace FilePrepper.Tasks.FileFormatConvert;
+﻿namespace FilePrepper.Tasks.FileFormatConvert;
 
 public enum FileFormat
 {
