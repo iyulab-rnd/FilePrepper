@@ -7,9 +7,8 @@ public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
 
     public DataTypeConvertTask(
         DataTypeConvertOption options,
-        ILogger<DataTypeConvertTask> logger,
-        ILogger<DataTypeConvertValidator> validatorLogger)
-        : base(options, logger, new DataTypeConvertValidator(validatorLogger))
+        ILogger<DataTypeConvertTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -28,7 +27,7 @@ public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
                             record[conversion.ColumnName],
                             conversion);
                     }
-                    catch (Exception) when (Options.IgnoreErrors)
+                    catch (Exception) when (Options.Common.ErrorHandling.IgnoreErrors)
                     {
                         record[conversion.ColumnName] = conversion.DefaultValue ?? string.Empty;
                     }

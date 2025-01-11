@@ -25,6 +25,6 @@ public class DropDuplicatesOption : BaseOption
             errors.Add("Target columns must be specified when using subset columns");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

@@ -24,6 +24,6 @@ public class OneHotEncodingOption : BaseColumnOption
             errors.Add("At least one target column must be specified for one-hot encoding.");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

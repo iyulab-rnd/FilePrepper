@@ -4,9 +4,8 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
 {
     public DateExtractionTask(
         DateExtractionOption options,
-        ILogger<DateExtractionTask> logger,
-        ILogger<DateExtractionValidator> validatorLogger)
-        : base(options, logger, new DateExtractionValidator(validatorLogger))
+        ILogger<DateExtractionTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -37,7 +36,7 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
                         newRecord[columnName] = string.Empty;
                     }
 
-                    if (!Options.IgnoreErrors)
+                    if (!Options.Common.ErrorHandling.IgnoreErrors)
                     {
                         throw;
                     }
@@ -52,8 +51,8 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
 
     private void ProcessDateExtraction(Dictionary<string, string> record, DateColumnExtraction extraction)
     {
-        if (!record.ContainsKey(extraction.SourceColumn) ||
-            string.IsNullOrWhiteSpace(record[extraction.SourceColumn]))
+        if (!record.TryGetValue(extraction.SourceColumn, out string? value) ||
+            string.IsNullOrWhiteSpace(value))
         {
             foreach (var component in extraction.Components)
             {
@@ -63,7 +62,6 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
             return;
         }
 
-        var value = record[extraction.SourceColumn];
         var culture = extraction.Culture ?? CultureInfo.InvariantCulture;
         var dateTime = extraction.DateFormat != null
             ? DateTime.ParseExact(value, extraction.DateFormat, culture)
@@ -95,14 +93,14 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
 
     private string GetOutputColumnName(DateColumnExtraction extraction, DateComponent component)
     {
-        if (!Options.Common.AppendToSource)
+        if (!Options.Common.Output.AppendToSource)
         {
             return extraction.OutputColumnTemplate!
                 .Replace("{column}", extraction.SourceColumn)
                 .Replace("{component}", component.ToString());
         }
 
-        return Options.Common.OutputColumnTemplate!
+        return Options.Common.Output.OutputColumnTemplate!
             .Replace("{column}", extraction.SourceColumn)
             .Replace("{component}", component.ToString());
     }

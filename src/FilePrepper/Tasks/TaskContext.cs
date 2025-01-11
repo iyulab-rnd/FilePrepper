@@ -2,7 +2,7 @@
 
 public class TaskContext
 {
-    public string InputPath { get; set; } = null!;
-    public string? OutputPath { get; set; }
-    public Dictionary<string, object> Parameters { get; set; } = [];
+    public required string InputPath { get; init; }
+    public required string OutputPath { get; init; }
+    public Dictionary<string, object> Parameters { get; } = [];
 }

@@ -34,12 +34,15 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                }
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AggregateTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -73,12 +76,15 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "Avg_{column}_for_{groupBy}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "Avg_{column}_for_{groupBy}"
+                }
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AggregateTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -110,8 +116,11 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = ""  // 빈 템플릿
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = ""  // 빈 템플릿
+                }
             }
         };
 
@@ -142,12 +151,15 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                }
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AggregateTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -192,12 +204,15 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                }
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AggregateTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = mixedDataPath,
@@ -240,12 +255,15 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             },
             Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
+                }
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AggregateTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = emptyGroupPath,

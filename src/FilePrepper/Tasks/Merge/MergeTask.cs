@@ -7,9 +7,8 @@ public class MergeTask : BaseTask<MergeOption>
 
     public MergeTask(
         MergeOption options,
-        ILogger<MergeTask> logger,
-        ILogger<MergeValidator> validatorLogger)
-        : base(options, logger, new MergeValidator(validatorLogger))
+        ILogger<MergeTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -41,15 +40,14 @@ public class MergeTask : BaseTask<MergeOption>
     private async Task<List<Dictionary<string, string>>> MergeVerticalAsync()
     {
         var allRecords = new List<Dictionary<string, string>>();
-        _allHeaders = new HashSet<string>();
+        _allHeaders = [];
 
         // 모든 파일에 대해 CSV를 읽어 합치기
         foreach (var path in Options.InputPaths)
         {
-            var newRecords = await ReadCsvFileAsync(path);
+            var (newRecords, _) = await ReadCsvFileAsync(path);  // 튜플 분해
             allRecords.AddRange(newRecords);
 
-            // 헤더(컬럼) 정보 추출
             if (newRecords.Count > 0)
             {
                 foreach (var header in newRecords[0].Keys)
@@ -58,6 +56,7 @@ public class MergeTask : BaseTask<MergeOption>
                 }
             }
         }
+
 
         // 컬럼 수가 다른 CSV를 머지할 때, 부족한 컬럼은 빈 문자열로 채움
         foreach (var record in allRecords)
@@ -83,7 +82,7 @@ public class MergeTask : BaseTask<MergeOption>
         // (파일이 N개면, 1,2번 -> 결과 -> 3번과 Join -> 결과 -> 4번과 Join ...)
 
         // 1) 일단 첫 번째 파일 읽기
-        var mergedRecords = await ReadCsvFileAsync(Options.InputPaths[0]);
+        var (mergedRecords, _) = await ReadCsvFileAsync(Options.InputPaths[0]);
 
         // allHeaders 초기화
         _allHeaders = new HashSet<string>(mergedRecords.SelectMany(r => r.Keys));
@@ -91,7 +90,7 @@ public class MergeTask : BaseTask<MergeOption>
         // 2) 두 번째 파일부터 차례로 Join
         for (int i = 1; i < Options.InputPaths.Count; i++)
         {
-            var nextRecords = await ReadCsvFileAsync(Options.InputPaths[i]);
+            var (nextRecords, _) = await ReadCsvFileAsync(Options.InputPaths[i]);
             mergedRecords = JoinTwoSets(mergedRecords, nextRecords);
         }
 

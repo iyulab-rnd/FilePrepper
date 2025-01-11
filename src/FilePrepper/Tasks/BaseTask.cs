@@ -5,22 +5,16 @@ namespace FilePrepper.Tasks;
 public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
 {
     protected readonly ILogger _logger;
-    protected readonly IOptionValidator _validator;
+    protected List<string> _originalHeaders = new();
 
     public string Name => GetType().Name.Replace("Task", string.Empty);
     public TOption Options { get; }
     ITaskOption ITask.Options => Options;
 
-    protected List<string> _originalHeaders = [];
-
-    protected BaseTask(
-        TOption options,
-        ILogger logger,
-        IOptionValidator validator)
+    protected BaseTask(TOption options, ILogger logger)
     {
         Options = options ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _validator = validator ?? throw new ArgumentNullException(nameof(validator));
     }
 
     public bool Execute(TaskContext context)
@@ -35,36 +29,40 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
             throw new ArgumentNullException(nameof(context));
         }
 
-        if (!_validator.Validate(Options, out var errors))
-        {
-            return ValidationUtils.ValidateAndLogErrors(errors, _logger);
-        }
-
         try
         {
-            _logger.LogInformation("Reading input file: {InputPath}", context.InputPath);
-            var records = await ReadAndPreProcessAsync(context);
+            // 필수 컬럼 검증
+            var requiredColumns = GetRequiredColumns().ToList();
+            if (requiredColumns.Count != 0)
+            {
+                using var reader = new StreamReader(context.InputPath);
+                using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
 
-            try
-            {
-                records = await ProcessRecordsAsync(records);
-                await PostProcessAndSaveAsync(records, context);
-                return true;
+                await csv.ReadAsync();
+                csv.ReadHeader();
+                var headers = csv.HeaderRecord?.ToList() ?? new List<string>();
+
+                var missingColumns = requiredColumns.Where(col => !headers.Contains(col)).ToList();
+                if (missingColumns.Count != 0)
+                {
+                    _logger.LogError("Required columns not found: {Columns}", string.Join(", ", missingColumns));
+                    return false;
+                }
             }
-            catch (Exception ex) when (Options.IgnoreErrors)
-            {
-                _logger.LogWarning(ex, "Error ignored and continuing in {TaskName} task", Name);
-                await PostProcessAndSaveAsync(records, context);
-                return true;
-            }
+
+            var records = await ReadAndPreProcessAsync(context);
+            records = await ProcessRecordsAsync(records);
+            await PostProcessAndWriteAsync(records, context);
+            return true;
         }
         catch (Exception ex)
         {
-            if (Options.IgnoreErrors)
+            if (Options.Common.ErrorHandling.IgnoreErrors)
             {
                 _logger.LogWarning(ex, "Error ignored in {TaskName} task", Name);
                 return true;
             }
+
             _logger.LogError(ex, "Error executing {TaskName} task", Name);
             return false;
         }
@@ -73,19 +71,35 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     private async Task<List<Dictionary<string, string>>> ReadAndPreProcessAsync(TaskContext context)
     {
         _logger.LogInformation("Reading input file: {InputPath}", context.InputPath);
-        var (records, headers) = await ReadCsvFileAndHeadersAsync(context.InputPath, GetRequiredColumns());
+        var (records, headers) = await ReadCsvFileAsync(context.InputPath);
         _originalHeaders = headers;
         return await PreProcessRecordsAsync(records);
     }
 
-    private async Task<(List<Dictionary<string, string>> Records, List<string> Headers)>
-        ReadCsvFileAndHeadersAsync(string filePath, IEnumerable<string>? requiredColumns = null)
+    protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
     {
-        var records = new List<Dictionary<string, string>>();
-        var csvConfig = CsvUtils.GetDefaultConfiguration();
+        return Task.FromResult(records);
+    }
 
+    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+        List<Dictionary<string, string>> records);
+
+    protected virtual Task<List<Dictionary<string, string>>> PostProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        return Task.FromResult(records);
+    }
+
+    protected virtual IEnumerable<string> GetRequiredColumns() =>
+        Options is BaseColumnOption columnOption ? columnOption.TargetColumns : Array.Empty<string>();
+
+    protected virtual async Task<(List<Dictionary<string, string>>, List<string>)> ReadCsvFileAsync(
+        string filePath,
+        IEnumerable<string>? requiredColumns = null)
+    {
         using var reader = new StreamReader(filePath);
-        using var csv = new CsvReader(reader, csvConfig);
+        using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
 
         await csv.ReadAsync();
         csv.ReadHeader();
@@ -94,13 +108,13 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         if (requiredColumns != null)
         {
             var headerErrors = CsvUtils.ValidateHeaders(requiredColumns, headers);
-            if (headerErrors.Any())
+            if (headerErrors.Count != 0)
             {
-                throw new InvalidOperationException(
-                    $"Header validation failed: {string.Join(", ", headerErrors)}");
+                throw new ValidationException(string.Join(", ", headerErrors));
             }
         }
 
+        var records = new List<Dictionary<string, string>>();
         while (await csv.ReadAsync())
         {
             var record = new Dictionary<string, string>();
@@ -114,32 +128,6 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         return (records, headers);
     }
 
-    protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
-        List<Dictionary<string, string>> records)
-    {
-        return Task.FromResult(records);
-    }
-
-    protected virtual Task<List<Dictionary<string, string>>> PostProcessRecordsAsync(
-        List<Dictionary<string, string>> records)
-    {
-        return Task.FromResult(records);
-    }
-
-    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
-        List<Dictionary<string, string>> records);
-
-    protected virtual IEnumerable<string> GetRequiredColumns() =>
-        Options is IColumnOption columnOption ? columnOption.TargetColumns : Array.Empty<string>();
-
-    protected async Task<List<Dictionary<string, string>>> ReadCsvFileAsync(
-        string filePath,
-        IEnumerable<string>? requiredColumns = null)
-    {
-        var (records, _) = await ReadCsvFileAndHeadersAsync(filePath, requiredColumns);
-        return records;
-    }
-
     protected virtual async Task WriteOutputAsync(
         string outputPath,
         IEnumerable<string> headers,
@@ -148,20 +136,18 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         var finalHeaders = headers.Any() ? headers : _originalHeaders;
         if (!finalHeaders.Any())
         {
-            finalHeaders = new[] { "NoData" };
+            finalHeaders = ["NoData"];
         }
 
         await using var writer = new StreamWriter(outputPath);
         await using var csv = new CsvWriter(writer, CsvUtils.GetDefaultConfiguration());
 
-        // Write headers
         foreach (var header in finalHeaders)
         {
             csv.WriteField(header);
         }
         csv.NextRecord();
 
-        // Write data rows
         foreach (var record in records)
         {
             foreach (var header in finalHeaders)
@@ -172,7 +158,7 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         }
     }
 
-    private async Task PostProcessAndSaveAsync(
+    private async Task PostProcessAndWriteAsync(
         List<Dictionary<string, string>> records,
         TaskContext context)
     {

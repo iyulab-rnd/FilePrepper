@@ -34,7 +34,7 @@ public class DateExtractionOption : BaseOption
         if (Extractions == null || Extractions.Count == 0)
         {
             errors.Add("At least one date extraction must be specified");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         foreach (var extraction in Extractions)
@@ -49,12 +49,12 @@ public class DateExtractionOption : BaseOption
                 errors.Add($"At least one component must be specified for column {extraction.SourceColumn}");
             }
 
-            if (string.IsNullOrWhiteSpace(extraction.OutputColumnTemplate) && !Common.AppendToSource)
+            if (string.IsNullOrWhiteSpace(extraction.OutputColumnTemplate) && !Common.Output.AppendToSource)
             {
                 errors.Add($"Output column template must be specified for column {extraction.SourceColumn} when not appending to source");
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

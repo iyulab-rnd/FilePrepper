@@ -14,21 +14,17 @@ public class FileFormatConvertTask : BaseTask<FileFormatConvertOption>
 
     public FileFormatConvertTask(
         FileFormatConvertOption options,
-        ILogger<FileFormatConvertTask> logger,
-        ILogger<FileFormatConvertValidator> validatorLogger)
-        : base(options, logger, new FileFormatConvertValidator(validatorLogger))
+        ILogger<FileFormatConvertTask> logger)
+        : base(options, logger)
     {
     }
 
     protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
-        if (!Options.IgnoreErrors && !_validator.Validate(Options, out var errors))
+        if (!Options.IsValid)
         {
-            if (!ValidationUtils.ValidateAndLogErrors(errors, _logger))
-            {
-                throw new ValidationException(string.Join(Environment.NewLine, errors));
-            }
+            throw new ValidationException("Invalid options");
         }
         return Task.FromResult(records);
     }

@@ -4,9 +4,8 @@ public class AggregateTask : BaseTask<AggregateOption>
 {
     public AggregateTask(
         AggregateOption options,
-        ILogger<AggregateTask> logger,
-        ILogger<AggregateValidator> validatorLogger)
-        : base(options, logger, new AggregateValidator(validatorLogger))
+        ILogger<AggregateTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -20,7 +19,7 @@ public class AggregateTask : BaseTask<AggregateOption>
         var groupResults = await CalculateAggregatesAsync(groups);
 
         // 결과 포맷팅
-        return Options.Common.AppendToSource
+        return Options.Common.Output.AppendToSource
             ? await WriteAppendedResultsAsync(records, groupResults)
             : await WriteAggregateResultsAsync(groupResults);
     }
@@ -64,7 +63,7 @@ public class AggregateTask : BaseTask<AggregateOption>
                         }
                     }
 
-                    if (values.Any())
+                    if (values.Count != 0)
                     {
                         var aggregateValue = CalculateAggregate(values, aggCol.Function);
                         var outputColumnName = GetAggregateColumnName(aggCol);
@@ -109,12 +108,12 @@ public class AggregateTask : BaseTask<AggregateOption>
 
     private string GetAggregateColumnName(AggregateColumn aggCol)
     {
-        if (!Options.Common.AppendToSource)
+        if (!Options.Common.Output.AppendToSource)
         {
             return aggCol.OutputColumnName;
         }
 
-        return Options.Common.OutputColumnTemplate!
+        return Options.Common.Output.OutputColumnTemplate!
             .Replace("{column}", aggCol.ColumnName)
             .Replace("{function}", aggCol.Function.ToString())
             .Replace("{groupBy}", string.Join("_", Options.GroupByColumns));

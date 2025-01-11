@@ -4,9 +4,8 @@ public class AddColumnsTask : BaseTask<AddColumnsOption>
 {
     public AddColumnsTask(
         AddColumnsOption options,
-        ILogger<AddColumnsTask> logger,
-        ILogger<AddColumnsValidator> validatorLogger)
-        : base(options, logger, new AddColumnsValidator(validatorLogger))
+        ILogger<AddColumnsTask> logger)
+        : base(options, logger)
     {
     }
 

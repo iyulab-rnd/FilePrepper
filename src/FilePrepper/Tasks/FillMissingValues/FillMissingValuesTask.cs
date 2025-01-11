@@ -4,9 +4,8 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
 {
     public FillMissingValuesTask(
         FillMissingValuesOption options,
-        ILogger<FillMissingValuesTask> logger,
-        ILogger<FillMissingValuesValidator> validatorLogger)
-        : base(options, logger, new FillMissingValuesValidator(validatorLogger))
+        ILogger<FillMissingValuesTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -79,7 +78,7 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
         {
             if (string.IsNullOrWhiteSpace(record.GetValueOrDefault(fillMethod.ColumnName)))
             {
-                record[fillMethod.ColumnName] = fillMethod.FixedValue ?? Options.DefaultValue ?? string.Empty;
+                record[fillMethod.ColumnName] = fillMethod.FixedValue ?? Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
             }
         }
         return Task.CompletedTask;
@@ -97,7 +96,7 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
             .Select(v => v!.Value)
             .ToList();
 
-        if (!validValues.Any())
+        if (validValues.Count == 0)
         {
             await FillWithDefaultValue(records, fillMethod);
             return;
@@ -128,7 +127,7 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
             .Where(v => !double.IsNaN(v))
             .ToList();
 
-        if (!validValues.Any())
+        if (validValues.Count == 0)
         {
             await FillWithDefaultValue(records, fillMethod);
             return;
@@ -255,7 +254,7 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
             else
             {
                 // 보간할 수 없는 경우 기본값 사용
-                records[i][fillMethod.ColumnName] = Options.DefaultValue ?? string.Empty;
+                records[i][fillMethod.ColumnName] = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
             }
         }
 
@@ -298,7 +297,7 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
         List<Dictionary<string, string>> records,
         ColumnFillMethod fillMethod)
     {
-        var defaultValue = Options.DefaultValue ?? string.Empty;
+        var defaultValue = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
         foreach (var record in records)
         {
             if (string.IsNullOrWhiteSpace(record.GetValueOrDefault(fillMethod.ColumnName)))

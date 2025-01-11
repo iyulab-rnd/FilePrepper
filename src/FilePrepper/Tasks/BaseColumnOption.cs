@@ -1,11 +1,14 @@
 ﻿namespace FilePrepper.Tasks;
 
-public abstract class BaseColumnOption : BaseOption, IColumnOption
+public abstract class BaseColumnOption : BaseOption
 {
-    public string[] TargetColumns { get; set; } = Array.Empty<string>();
+    public string[] TargetColumns { get; set; } = [];
 
-    protected override string[] ValidateInternal()
+    public override string[] Validate()
     {
-        return ValidationUtils.ValidateColumns(TargetColumns, "target columns");
+        var errors = new List<string>();
+        errors.AddRange(ValidationUtils.ValidateColumns(TargetColumns));
+        errors.AddRange(ValidateInternal());
+        return [.. errors];
     }
 }

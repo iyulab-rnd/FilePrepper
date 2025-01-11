@@ -107,7 +107,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = file1,  // 실제로는 사용되지 않음
@@ -159,7 +159,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -209,7 +209,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = file1,
@@ -260,7 +260,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = file1,
@@ -311,7 +311,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = file1,
@@ -358,7 +358,7 @@ public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
             InputPaths = new() { file1, file2 }
         };
 
-        var task = new MergeTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new MergeTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = file1,

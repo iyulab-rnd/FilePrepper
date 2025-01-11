@@ -39,6 +39,6 @@ public class DataSamplingOption : BaseOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

@@ -4,9 +4,8 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
 {
     public BasicStatisticsTask(
         BasicStatisticsOption options,
-        ILogger<BasicStatisticsTask> logger,
-        ILogger<BasicStatisticsValidator> validatorLogger)
-        : base(options, logger, new BasicStatisticsValidator(validatorLogger))
+        ILogger<BasicStatisticsTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -27,7 +26,7 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
     }
 
     private async Task<Dictionary<string, List<double>>> CollectNumericDataAsync(
-        List<Dictionary<string, string>> records)
+    List<Dictionary<string, string>> records)
     {
         return await Task.Run(() =>
         {
@@ -45,9 +44,10 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
                         {
                             columnData[column].Add(value);
                         }
-                        else if (Options.IgnoreErrors && Options.DefaultValue != null)
+                        else if (Options.Common.ErrorHandling.IgnoreErrors &&
+                                Options.Common.ErrorHandling.DefaultValue != null)
                         {
-                            if (double.TryParse(Options.DefaultValue, out var defaultValue))
+                            if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out var defaultValue))
                             {
                                 columnData[column].Add(defaultValue);
                             }
@@ -60,7 +60,7 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
                                 column);
                         }
                     }
-                    catch (Exception ex) when (Options.IgnoreErrors)
+                    catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
                     {
                         _logger.LogWarning(ex, "Error processing value for column {Column}", column);
                     }
@@ -80,7 +80,7 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
 
             foreach (var (column, values) in columnData)
             {
-                if (!values.Any())
+                if (values.Count == 0)
                 {
                     _logger.LogWarning("No valid numeric data found in column {Column}", column);
                     continue;

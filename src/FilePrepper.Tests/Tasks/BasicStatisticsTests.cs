@@ -48,7 +48,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -96,7 +96,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = outlierDataPath,
@@ -148,7 +148,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -184,7 +184,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             Statistics = new[] { StatisticType.ZScore }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -221,7 +221,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             Statistics = new[] { StatisticType.PercentRank }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -259,7 +259,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -305,7 +305,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new BasicStatisticsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,

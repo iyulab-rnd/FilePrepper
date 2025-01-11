@@ -21,7 +21,7 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
             NewColumns = new Dictionary<string, string> { { "Age", "30" } }
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AddColumnsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -105,7 +105,7 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
             NewColumns = new Dictionary<string, string> { { "Name", "Test" } }  // Name already exists in input file
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AddColumnsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -133,7 +133,7 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
             }
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new AddColumnsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,

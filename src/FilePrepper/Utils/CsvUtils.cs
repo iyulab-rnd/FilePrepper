@@ -55,7 +55,7 @@ public static class CsvUtils
         var result = new Dictionary<string, double>();
         foreach (var col in columns)
         {
-            if (!record.ContainsKey(col))
+            if (!record.TryGetValue(col, out string? value))
             {
                 if (ignoreErrors && defaultValue.HasValue)
                 {
@@ -65,9 +65,9 @@ public static class CsvUtils
                 throw new KeyNotFoundException($"Column not found: {col}");
             }
 
-            if (TryParseNumeric(record[col], out var value))
+            if (TryParseNumeric(value, out var v))
             {
-                result[col] = value;
+                result[col] = v;
             }
             else if (ignoreErrors && defaultValue.HasValue)
             {
@@ -81,5 +81,46 @@ public static class CsvUtils
         return result;
     }
 
+    public static bool ValidateNumericColumns(
+        this Dictionary<string, string> record,
+        IEnumerable<string> numericColumns,
+        out Dictionary<string, double> numericValues,
+        bool ignoreErrors = false,
+        string? defaultValue = null)
+    {
+        numericValues = [];
 
+        foreach (var column in numericColumns)
+        {
+            if (!record.TryGetValue(column, out string? value))
+            {
+                if (ignoreErrors && defaultValue != null)
+                {
+                    if (double.TryParse(defaultValue, out var defaultNum))
+                    {
+                        numericValues[column] = defaultNum;
+                        continue;
+                    }
+                }
+                return false;
+            }
+
+            if (!CsvUtils.TryParseNumeric(value, out var v2))
+            {
+                if (ignoreErrors && defaultValue != null)
+                {
+                    if (double.TryParse(defaultValue, out var defaultNum))
+                    {
+                        numericValues[column] = defaultNum;
+                        continue;
+                    }
+                }
+                return false;
+            }
+
+            numericValues[column] = v2;
+        }
+
+        return true;
+    }
 }

@@ -3,6 +3,6 @@
 public interface ITask
 {
     string Name { get; }
-    bool Execute(TaskContext context);
+    Task<bool> ExecuteAsync(TaskContext context);
     ITaskOption Options { get; }
 }

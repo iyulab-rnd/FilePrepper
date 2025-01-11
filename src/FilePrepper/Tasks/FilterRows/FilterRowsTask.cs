@@ -4,9 +4,8 @@ public class FilterRowsTask : BaseTask<FilterRowsOption>
 {
     public FilterRowsTask(
         FilterRowsOption options,
-        ILogger<FilterRowsTask> logger,
-        ILogger<FilterRowsValidator> validatorLogger)
-        : base(options, logger, new FilterRowsValidator(validatorLogger))
+        ILogger<FilterRowsTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -25,9 +24,7 @@ public class FilterRowsTask : BaseTask<FilterRowsOption>
         foreach (var cond in Options.Conditions)
         {
             // 컬럼이 존재하지 않으면 자동 불일치
-            if (!record.ContainsKey(cond.ColumnName)) return false;
-            var cellValue = record[cond.ColumnName];
-
+            if (!record.TryGetValue(cond.ColumnName, out string? cellValue)) return false;
             if (!MatchesCondition(cellValue, cond))
                 return false;
         }

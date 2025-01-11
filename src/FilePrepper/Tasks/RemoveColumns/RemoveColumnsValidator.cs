@@ -6,11 +6,4 @@ public class RemoveColumnsValidator : BaseValidator<RemoveColumnsOption>
         : base(logger)
     {
     }
-
-    // If you need additional validations beyond what's in RemoveColumnsOption.ValidateInternal, 
-    // implement them in ValidateSpecific().
-    protected override string[] ValidateSpecific(RemoveColumnsOption option)
-    {
-        return Array.Empty<string>();
-    }
 }

@@ -45,6 +45,6 @@ public class FilterRowsOption : BaseColumnOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

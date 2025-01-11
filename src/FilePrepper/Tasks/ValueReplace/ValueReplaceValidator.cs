@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.ValueReplace;
 
-namespace FilePrepper.Tasks.ValueReplace
+public class ValueReplaceValidator : BaseValidator<ValueReplaceOption>
 {
-    public class ValueReplaceValidator
+    public ValueReplaceValidator(ILogger<ValueReplaceValidator> logger) : base(logger)
     {
     }
 }

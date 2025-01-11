@@ -45,6 +45,6 @@ public class FileFormatConvertOption : BaseOption
             errors.AddRange(ValidationUtils.ValidateColumns(new[] { ItemElementName }, "item element name"));
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

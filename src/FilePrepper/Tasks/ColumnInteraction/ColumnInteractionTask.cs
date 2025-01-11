@@ -6,9 +6,8 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
 {
     public ColumnInteractionTask(
         ColumnInteractionOption options,
-        ILogger<ColumnInteractionTask> logger,
-        ILogger<ColumnInteractionValidator> validatorLogger)
-        : base(options, logger, new ColumnInteractionValidator(validatorLogger))
+        ILogger<ColumnInteractionTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -31,10 +30,10 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
                 {
                     record[Options.OutputColumn] = ProcessRecord(record);
                 }
-                catch (Exception ex) when (Options.IgnoreErrors)
+                catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
                 {
                     _logger.LogWarning("Error processing row: {Error}", ex.Message);
-                    record[Options.OutputColumn] = Options.DefaultValue ?? string.Empty;
+                    record[Options.OutputColumn] = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
                 }
             }
         });
@@ -59,7 +58,7 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
     private string ProcessNumericOperation(string[] values)
     {
         var numbers = GetNumericValues(values);
-        if (!numbers.Any()) return string.Empty;
+        if (numbers.Count == 0) return string.Empty;
 
         double result = Options.Operation switch
         {
@@ -110,9 +109,9 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
             {
                 numbers.Add(number);
             }
-            else if (Options.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.DefaultValue))
+            else if (Options.Common.ErrorHandling.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.Common.ErrorHandling.DefaultValue))
             {
-                if (double.TryParse(Options.DefaultValue, out var defaultNum))
+                if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out var defaultNum))
                 {
                     numbers.Add(defaultNum);
                 }
@@ -133,9 +132,9 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
             return value;
         }
 
-        if (Options.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.DefaultValue))
+        if (Options.Common.ErrorHandling.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.Common.ErrorHandling.DefaultValue))
         {
-            return Options.DefaultValue;
+            return Options.Common.ErrorHandling.DefaultValue;
         }
 
         throw new ArgumentException($"Invalid numeric value: {value}");

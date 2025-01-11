@@ -7,9 +7,8 @@ namespace FilePrepper.Tasks.ReorderColumns
     {
         public ReorderColumnsTask(
             ReorderColumnsOption options,
-            ILogger<ReorderColumnsTask> logger,
-            ILogger<ReorderColumnsValidator> validatorLogger)
-            : base(options, logger, new ReorderColumnsValidator(validatorLogger))
+            ILogger<ReorderColumnsTask> logger)
+            : base(options, logger)
         {
         }
 
@@ -50,7 +49,7 @@ namespace FilePrepper.Tasks.ReorderColumns
             IEnumerable<Dictionary<string, string>> records)
         {
             string[] finalHeaders = [.. _originalHeaders];
-            if (!finalHeaders.Any())
+            if (finalHeaders.Length == 0)
             {
                 finalHeaders = ["NoData"];
             }

@@ -84,6 +84,6 @@ public class MergeOption : BaseOption
             errors.Add("At least one join key column must be specified for horizontal merge.");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

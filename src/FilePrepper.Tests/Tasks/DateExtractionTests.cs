@@ -39,13 +39,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                 Output = new OutputOptions
+                 {
+                     AppendToSource = false
+                 }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -92,13 +95,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = customFormatPath,
@@ -144,13 +150,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = culturePath,
@@ -188,13 +197,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -238,13 +250,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -279,22 +294,29 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
         var options = new DateExtractionOption
         {
             Extractions = new List<DateColumnExtraction>
-        {
-            new()
             {
-                SourceColumn = "DateValue",
-                Components = new List<DateComponent> { DateComponent.Year },
-                OutputColumnTemplate = "{column}_{component}"
-            }
-        },
-            Common = new CommonTaskOptions
+                new()
+                {
+                    SourceColumn = "DateValue",
+                    Components = new List<DateComponent> { DateComponent.Year },
+                    OutputColumnTemplate = "{column}_{component}"
+                }
+            },
+
+            Common = new CommonTaskOptions 
             {
-                AppendToSource = false,
-                IgnoreErrors = true
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                },
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = true
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -346,14 +368,20 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            IgnoreErrors = false,
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                },
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -388,13 +416,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "{column}_{component}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = emptyInputPath,
@@ -427,14 +458,17 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     Components = new List<DateComponent> { DateComponent.Year },
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = true,
-                OutputColumnTemplate = "{column}_{component}"
+                Output = new OutputOptions
+                {
+                    AppendToSource = true,
+                    OutputColumnTemplate = "{column}_{component}"
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -476,13 +510,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = "Month_{column}"
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DateExtractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -582,9 +619,12 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
                     OutputColumnTemplate = null
                 }
             },
-            Common = new()
+            Common = new CommonTaskOptions
             {
-                AppendToSource = false
+                Output = new OutputOptions
+                {
+                    AppendToSource = false
+                }
             }
         };
 

@@ -14,7 +14,7 @@ public class RenameColumnsOption : BaseOption
         if (RenameMap == null || RenameMap.Count == 0)
         {
             errors.Add("At least one column rename mapping must be specified.");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         foreach (var kv in RenameMap)
@@ -29,6 +29,6 @@ public class RenameColumnsOption : BaseOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

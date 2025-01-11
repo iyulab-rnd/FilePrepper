@@ -50,6 +50,6 @@ public class NormalizeDataOption : BaseColumnOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

@@ -45,7 +45,7 @@ public class FillMissingValuesOption : BaseColumnOption
         if (FillMethods.Count == 0)
         {
             errors.Add("At least one fill method must be specified");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         // 각 FillMethod마다 검증
@@ -64,6 +64,6 @@ public class FillMissingValuesOption : BaseColumnOption
             // (예전 코드에서 TargetColumns에 컬럼을 추가하던 부분은 Validate()로 옮겼음)
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

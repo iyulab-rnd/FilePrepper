@@ -11,7 +11,7 @@ public class AddColumnsOption : BaseOption
         if (NewColumns == null || NewColumns.Count == 0)
         {
             errors.Add("At least one new column must be specified");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         foreach (var columnName in NewColumns.Keys)
@@ -22,6 +22,6 @@ public class AddColumnsOption : BaseOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

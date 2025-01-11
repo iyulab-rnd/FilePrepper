@@ -36,7 +36,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = outputColumn
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -75,7 +75,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = "CombinedText"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -105,7 +105,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             CustomExpression = "$1 + $2 * $3"  // ($1 = Value1, $2 = Value2, $3 = Value3)
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -143,11 +143,17 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Sum",
-            IgnoreErrors = true,
-            DefaultValue = "0"
+            Common = new CommonTaskOptions 
+            { 
+                ErrorHandling = new ErrorHandlingOptions()
+                {
+                    IgnoreErrors = true,
+                    DefaultValue = "0"
+                }
+            },
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -181,10 +187,16 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Sum",
-            IgnoreErrors = false
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions()
+                {
+                    IgnoreErrors = false,
+                }
+            }
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -217,11 +229,17 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Divide,
             OutputColumn = "Division",
-            IgnoreErrors = true,
-            DefaultValue = "-1"
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions()
+                {
+                    IgnoreErrors = true,
+                    DefaultValue = "-1"
+                }
+            }
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = divisionByZeroPath,
@@ -307,7 +325,13 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Result",
-            DefaultValue = "not-a-number"
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions()
+                {
+                    DefaultValue = "not-a-number"
+                }
+            }
         };
 
         // Act
@@ -328,7 +352,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = "Total"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -358,7 +382,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = "Value1"  // 이미 존재하는 컬럼명
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -384,7 +408,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             CustomExpression = "($1 + $2) * $3 / 2"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new ColumnInteractionTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,

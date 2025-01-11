@@ -5,9 +5,8 @@ public class DropDuplicatesTask : BaseTask<DropDuplicatesOption>
 {
     public DropDuplicatesTask(
         DropDuplicatesOption options,
-        ILogger<DropDuplicatesTask> logger,
-        ILogger<DropDuplicatesValidator> validatorLogger)
-        : base(options, logger, new DropDuplicatesValidator(validatorLogger))
+        ILogger<DropDuplicatesTask> logger)
+        : base(options, logger)
     {
         if (options.Common == null)
         {

@@ -34,7 +34,7 @@ public class DataTypeConvertOption : BaseOption
         if (Conversions == null || Conversions.Count == 0)
         {
             errors.Add("At least one column conversion must be specified");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         foreach (var conversion in Conversions)
@@ -59,7 +59,7 @@ public class DataTypeConvertOption : BaseOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 
     private bool IsValidDefaultValue(string value, DataType targetType)

@@ -4,9 +4,8 @@ public class RemoveColumnsTask : BaseTask<RemoveColumnsOption>
 {
     public RemoveColumnsTask(
         RemoveColumnsOption options,
-        ILogger<RemoveColumnsTask> logger,
-        ILogger<RemoveColumnsValidator> validatorLogger)
-        : base(options, logger, new RemoveColumnsValidator(validatorLogger))
+        ILogger<RemoveColumnsTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -30,10 +29,7 @@ public class RemoveColumnsTask : BaseTask<RemoveColumnsOption>
         {
             foreach (var colToRemove in Options.RemoveColumns)
             {
-                if (record.ContainsKey(colToRemove))
-                {
-                    record.Remove(colToRemove);
-                }
+                record.Remove(colToRemove);
             }
         }
 

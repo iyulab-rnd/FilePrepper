@@ -4,9 +4,8 @@ public class RenameColumnsTask : BaseTask<RenameColumnsOption>
 {
     public RenameColumnsTask(
         RenameColumnsOption options,
-        ILogger<RenameColumnsTask> logger,
-        ILogger<RenameColumnsValidator> validatorLogger)
-        : base(options, logger, new RenameColumnsValidator(validatorLogger))
+        ILogger<RenameColumnsTask> logger)
+        : base(options, logger)
     {
     }
 
@@ -21,7 +20,7 @@ public class RenameColumnsTask : BaseTask<RenameColumnsOption>
         var newHeaderOrder = new List<string>();
         foreach (var col in oldHeadersCopy)
         {
-            newHeaderOrder.Add(renameMap.ContainsKey(col) ? renameMap[col] : col);
+            newHeaderOrder.Add(renameMap.TryGetValue(col, out string? value) ? value : col);
         }
         // 출력용 헤더 순서 업데이트
         _originalHeaders = newHeaderOrder;
@@ -32,10 +31,10 @@ public class RenameColumnsTask : BaseTask<RenameColumnsOption>
             var newRecord = new Dictionary<string, string>();
             foreach (var col in oldHeadersCopy)
             {
-                string newColName = renameMap.ContainsKey(col) ? renameMap[col] : col;
-                if (record.ContainsKey(col))
+                string newColName = renameMap.TryGetValue(col, out string? v) ? v : col;
+                if (record.TryGetValue(col, out string? value))
                 {
-                    newRecord[newColName] = record[col];
+                    newRecord[newColName] = value;
                 }
                 else
                 {

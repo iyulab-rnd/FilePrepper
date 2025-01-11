@@ -7,7 +7,7 @@ public class DropDuplicatesValidator : BaseValidator<DropDuplicatesOption>
     {
     }
 
-    protected override string[] ValidateCommon(DropDuplicatesOption option)
+    protected override string[] ValidateSpecific(DropDuplicatesOption option)
     {
         var errors = new List<string>();
 
@@ -17,6 +17,6 @@ public class DropDuplicatesValidator : BaseValidator<DropDuplicatesOption>
             errors.AddRange(ValidationUtils.ValidateColumns(option.TargetColumns));
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

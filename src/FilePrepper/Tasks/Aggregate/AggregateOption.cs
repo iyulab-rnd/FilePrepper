@@ -46,18 +46,18 @@ public class AggregateOption : BaseOption
                 {
                     errors.Add("Aggregate column name cannot be empty");
                 }
-                if (string.IsNullOrWhiteSpace(col.OutputColumnName) && !Common.AppendToSource)
+                if (string.IsNullOrWhiteSpace(col.OutputColumnName) && !Common.Output.AppendToSource)
                 {
                     errors.Add("Output column name cannot be empty when not appending to source");
                 }
             }
         }
 
-        if (string.IsNullOrWhiteSpace(Common.OutputColumnTemplate) && Common.AppendToSource)
+        if (string.IsNullOrWhiteSpace(Common.Output.OutputColumnTemplate) && Common.Output.AppendToSource)
         {
             errors.Add("Column template is required when appending to source");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

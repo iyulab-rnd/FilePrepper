@@ -32,7 +32,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             Encoding = Encoding.UTF8
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -60,7 +60,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             HasHeader = true
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -88,7 +88,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             PrettyPrint = true
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -122,7 +122,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             PrettyPrint = true
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -154,7 +154,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             Encoding = Encoding.UTF32
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -181,7 +181,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             HasHeader = false
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -254,7 +254,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFo
             PrettyPrint = true
         };
 
-        var task = new FileFormatConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FileFormatConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = emptyInputPath,

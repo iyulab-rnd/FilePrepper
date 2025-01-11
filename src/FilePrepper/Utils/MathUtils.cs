@@ -11,7 +11,7 @@ public static class MathUtils
     public static double CalculateMedian(IEnumerable<double> values)
     {
         var sorted = values.OrderBy(x => x).ToList();
-        if (!sorted.Any()) return 0;
+        if (sorted.Count == 0) return 0;
 
         int n = sorted.Count;
         return n % 2 == 0
@@ -22,7 +22,7 @@ public static class MathUtils
     public static double CalculateStandardDeviation(IEnumerable<double> values)
     {
         var enumerable = values as double[] ?? values.ToArray();
-        if (!enumerable.Any()) return 0;
+        if (enumerable.Length == 0) return 0;
 
         double mean = CalculateMean(enumerable);
         double sumOfSquares = enumerable.Sum(x => Math.Pow(x - mean, 2));
@@ -32,7 +32,7 @@ public static class MathUtils
     public static double CalculateMAD(IEnumerable<double> values)
     {
         var enumerable = values as double[] ?? values.ToArray();
-        if (!enumerable.Any()) return 0;
+        if (enumerable.Length == 0) return 0;
 
         double median = CalculateMedian(enumerable);
         var absoluteDeviations = enumerable.Select(x => Math.Abs(x - median)).OrderBy(x => x).ToList();
@@ -42,7 +42,7 @@ public static class MathUtils
     public static (double value, int rank) CalculatePercentRank(double value, IEnumerable<double> values)
     {
         var sortedValues = values.OrderBy(x => x).ToList();
-        if (!sortedValues.Any()) return (0, 0);
+        if (sortedValues.Count == 0) return (0, 0);
 
         if (value <= sortedValues[0]) return (0, 0);
         if (value >= sortedValues[^1]) return (100, sortedValues.Count - 1);

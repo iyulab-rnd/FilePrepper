@@ -38,7 +38,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -82,7 +82,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -122,7 +122,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -161,7 +161,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -200,7 +200,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -239,7 +239,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -285,7 +285,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
         }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -329,7 +329,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
         };
 
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -374,7 +374,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -503,10 +503,16 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
                     Method = FillMethod.Mean
                 }
             },
-            DefaultValue = "0" // DefaultValue 설정
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    DefaultValue = "0"
+                }
+            }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = testFile,
@@ -552,7 +558,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -590,7 +596,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FillMissingValuesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = testFile,

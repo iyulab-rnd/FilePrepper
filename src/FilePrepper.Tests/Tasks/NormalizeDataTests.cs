@@ -86,7 +86,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -128,7 +128,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             TargetColumns = new[] { "Score" }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -170,7 +170,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -208,7 +208,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             TargetColumns = new[] { "Score" }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -246,11 +246,17 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             TargetColumns = new[] { "Score" },
             MinValue = 0,
             MaxValue = 1,
-            IgnoreErrors = true,
-            DefaultValue = "0"
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = true,
+                    DefaultValue = "0"
+                }
+            }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {
@@ -293,7 +299,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new NormalizeDataTask(option, _mockLogger.Object);
 
         var context = new TaskContext
         {

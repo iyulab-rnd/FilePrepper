@@ -23,6 +23,6 @@ public class ReorderColumnsOption : BaseOption
                 errors.Add("Column name in order cannot be empty or whitespace.");
             }
         }
-        return errors.ToArray();
+        return [.. errors];
     }
 }

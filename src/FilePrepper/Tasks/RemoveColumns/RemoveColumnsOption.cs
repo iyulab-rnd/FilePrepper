@@ -14,7 +14,7 @@ public class RemoveColumnsOption : BaseOption
         if (RemoveColumns == null || RemoveColumns.Count == 0)
         {
             errors.Add("At least one column must be specified to remove.");
-            return errors.ToArray();
+            return [.. errors];
         }
 
         foreach (var columnName in RemoveColumns)
@@ -25,6 +25,6 @@ public class RemoveColumnsOption : BaseOption
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

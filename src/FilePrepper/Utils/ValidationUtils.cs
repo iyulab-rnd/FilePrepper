@@ -15,7 +15,7 @@ public static class ValidationUtils
             errors.Add($"{purpose} name cannot be empty or whitespace");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 
     public static List<string> ValidateColumns(IEnumerable<string> columns)
@@ -40,7 +40,7 @@ public static class ValidationUtils
             errors.Add($"{name} must be less than {max.Value}");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 
     public static string[] ValidateRequiredOption<T>(T option, string optionName)
@@ -56,7 +56,7 @@ public static class ValidationUtils
     public static bool ValidateAndLogErrors(IEnumerable<string> errors, ILogger logger)
     {
         var errorList = errors.ToList();
-        if (errorList.Any())
+        if (errorList.Count != 0)
         {
             foreach (var error in errorList)
             {

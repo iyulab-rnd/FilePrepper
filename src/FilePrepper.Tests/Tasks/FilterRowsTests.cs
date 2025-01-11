@@ -39,7 +39,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask, FilterRowsValidator>
             }
         };
 
-        var task = new FilterRowsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FilterRowsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -75,7 +75,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask, FilterRowsValidator>
             }
         };
 
-        var task = new FilterRowsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FilterRowsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -111,7 +111,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask, FilterRowsValidator>
         }
         };
 
-        var task = new FilterRowsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FilterRowsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -149,7 +149,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask, FilterRowsValidator>
             }
         };
 
-        var task = new FilterRowsTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new FilterRowsTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,

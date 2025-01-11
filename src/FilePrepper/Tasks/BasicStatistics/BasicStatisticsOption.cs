@@ -16,10 +16,9 @@ public enum StatisticType
 }
 
 
-public class BasicStatisticsOption : BaseOption, IColumnOption
+public class BasicStatisticsOption : BaseColumnOption
 {
-    public string[] TargetColumns { get; set; } = Array.Empty<string>();
-    public StatisticType[] Statistics { get; set; } = Array.Empty<StatisticType>();
+    public StatisticType[] Statistics { get; set; } = [];
     public string Suffix { get; set; } = "_stat";
 
     protected override string[] ValidateInternal()
@@ -36,6 +35,6 @@ public class BasicStatisticsOption : BaseOption, IColumnOption
             errors.Add("Suffix cannot be empty or whitespace");
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

@@ -35,7 +35,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
         }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -71,7 +71,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
         }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -120,7 +120,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
             };
 
-            var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+            var task = new DataTypeConvertTask(options, _mockLogger.Object);
             var context = new TaskContext
             {
                 InputPath = cultureDataPath,
@@ -157,7 +157,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -196,7 +196,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -240,10 +240,16 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
                     DefaultValue = "-1"
                 }
             },
-            IgnoreErrors = true
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = true
+                }
+            }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -284,10 +290,16 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
                     TargetType = DataType.Integer
                 }
             },
-            IgnoreErrors = false
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = false
+                }
+            }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = invalidDataPath,
@@ -325,7 +337,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -363,7 +375,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DataTypeConvertTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = emptyInputPath,

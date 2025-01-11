@@ -1,12 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.ValueReplace;
 
-namespace FilePrepper.Tasks.ValueReplace
+public class ValueReplaceTask : BaseTask<ValueReplaceOption>
 {
-    public class ValueReplaceTask
+    public ValueReplaceTask(
+        ValueReplaceOption options,
+        ILogger<ValueReplaceTask> logger)
+        : base(options, logger)
     {
+    }
+
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        foreach (var method in Options.ReplaceMethods)
+        {
+            foreach (var record in records)
+            {
+                var colName = method.ColumnName;
+                if (record.TryGetValue(colName, out string? value))
+                {
+                    if (method.Replacements.TryGetValue(value, out string? v))
+                    {
+                        record[colName] = v;
+                    }
+                }
+            }
+        }
+
+        return Task.FromResult(records);
     }
 }

@@ -7,13 +7,12 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
 {
     public NormalizeDataTask(
         NormalizeDataOption options,
-        ILogger<NormalizeDataTask> logger,
-        ILogger<NormalizeDataValidator> validatorLogger)
-        : base(options, logger, new NormalizeDataValidator(validatorLogger))
+        ILogger<NormalizeDataTask> logger)
+        : base(options, logger)
     {
     }
 
-    protected override async Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
         // 1) Filter columns to only those that actually exist in the CSV
@@ -30,7 +29,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
         // If no matching columns exist, just return records as-is
         if (numericCols.Length == 0)
         {
-            return records;
+            return Task.FromResult(records);
         }
 
         // 2) Prepare to gather stats: min, max, mean, stdDev
@@ -44,7 +43,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
             // If a value is invalid (including "NaN" after our new parser logic), 
             // we either skip or use DefaultValue, depending on IgnoreErrors.
             if (rec.ValidateNumericColumns(numericCols, out var numericValues,
-                Options.IgnoreErrors, Options.DefaultValue))
+                Options.Common.ErrorHandling.IgnoreErrors, Options.Common.ErrorHandling.DefaultValue))
             {
                 // Gather values for stats
                 foreach (var col in numericCols)
@@ -83,7 +82,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
         foreach (var rec in records)
         {
             if (rec.ValidateNumericColumns(numericCols, out var numericValues,
-                Options.IgnoreErrors, Options.DefaultValue))
+                Options.Common.ErrorHandling.IgnoreErrors, Options.Common.ErrorHandling.DefaultValue))
             {
                 foreach (var col in numericCols)
                 {
@@ -125,7 +124,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
             }
         }
 
-        return records;
+        return Task.FromResult(records);
     }
 
     protected override IEnumerable<string> GetRequiredColumns()

@@ -4,9 +4,8 @@ public class DataSamplingTask : BaseTask<DataSamplingOption>
 {
     public DataSamplingTask(
         DataSamplingOption options,
-        ILogger<DataSamplingTask> logger,
-        ILogger<DataSamplingValidator> validatorLogger)
-        : base(options, logger, new DataSamplingValidator(validatorLogger))
+        ILogger<DataSamplingTask> logger)
+        : base(options, logger)
     {
     }
 

@@ -29,7 +29,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             Common = new CommonTaskOptions()
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -66,7 +66,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             Common = new CommonTaskOptions()
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -103,7 +103,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             Common = new CommonTaskOptions()
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -135,7 +135,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             Common = new CommonTaskOptions()
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -167,7 +167,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             SubsetColumnsOnly = false
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -218,7 +218,7 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicat
             TargetColumns = new[] { "Department" }
         };
 
-        var task = new DropDuplicatesTask(options, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new DropDuplicatesTask(options, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,

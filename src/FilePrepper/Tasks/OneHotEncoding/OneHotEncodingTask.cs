@@ -7,17 +7,16 @@ public class OneHotEncodingTask : BaseTask<OneHotEncodingOption>
 {
     public OneHotEncodingTask(
         OneHotEncodingOption options,
-        ILogger<OneHotEncodingTask> logger,
-        ILogger<OneHotEncodingValidator> validatorLogger)
-        : base(options, logger, new OneHotEncodingValidator(validatorLogger))
+        ILogger<OneHotEncodingTask> logger)
+        : base(options, logger)
     {
     }
 
-    protected override async Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+    protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
         if (records.Count == 0)
-            return records;
+            return Task.FromResult(records);
 
         // 1) Collect all distinct categories for each target column
         var categoryMap = new Dictionary<string, List<string>>();
@@ -30,9 +29,8 @@ public class OneHotEncodingTask : BaseTask<OneHotEncodingOption>
         {
             foreach (var col in Options.TargetColumns)
             {
-                if (rec.ContainsKey(col))
+                if (rec.TryGetValue(col, out string? value))
                 {
-                    var value = rec[col];
                     if (!categoryMap[col].Contains(value))
                     {
                         categoryMap[col].Add(value);
@@ -86,7 +84,7 @@ public class OneHotEncodingTask : BaseTask<OneHotEncodingOption>
             }
         }
 
-        return records;
+        return Task.FromResult(records);
     }
 
     protected override IEnumerable<string> GetRequiredColumns()

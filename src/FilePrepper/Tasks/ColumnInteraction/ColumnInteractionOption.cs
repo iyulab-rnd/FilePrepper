@@ -46,14 +46,14 @@ public class ColumnInteractionOption : BaseOption
             errors.Add("Custom expression cannot be empty when using Custom operation type");
         }
 
-        if (!string.IsNullOrWhiteSpace(DefaultValue))
+        if (!string.IsNullOrWhiteSpace(Common.ErrorHandling.DefaultValue))
         {
-            if (Operation != OperationType.Concat && !double.TryParse(DefaultValue, out _))
+            if (Operation != OperationType.Concat && !double.TryParse(Common.ErrorHandling.DefaultValue, out _))
             {
                 errors.Add("Default value must be a valid number for numeric operations");
             }
         }
 
-        return errors.ToArray();
+        return [.. errors];
     }
 }

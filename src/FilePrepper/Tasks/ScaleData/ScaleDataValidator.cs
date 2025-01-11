@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FilePrepper.Tasks.ScaleData;
 
-namespace FilePrepper.Tasks.ScaleData
+public class ScaleDataValidator : BaseValidator<ScaleDataOption>
 {
-    public class ScaleDataValidator
+    public ScaleDataValidator(ILogger<ScaleDataValidator> logger) : base(logger)
     {
     }
 }

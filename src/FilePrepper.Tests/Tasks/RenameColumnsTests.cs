@@ -60,7 +60,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new RenameColumnsTask(option, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -96,7 +96,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new RenameColumnsTask(option, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
@@ -134,7 +134,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object, _mockValidatorLogger.Object);
+        var task = new RenameColumnsTask(option, _mockLogger.Object);
         var context = new TaskContext
         {
             InputPath = _testInputPath,
