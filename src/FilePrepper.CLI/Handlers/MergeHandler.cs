@@ -1,7 +1,7 @@
-﻿using FilePrepper.Tasks.Merge;
+﻿using FilePrepper.CLI.Parameters;
 using FilePrepper.Tasks;
+using FilePrepper.Tasks.Merge;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Parameters;
 
 namespace FilePrepper.CLI.Handlers;
 
@@ -24,31 +24,37 @@ public class MergeHandler : ICommandHandler
 
         try
         {
-            // Validate input files
-            if (!opts.InputPaths.Any())
+            // 입력 파일 검증
+            if (!opts.InputFiles.Any())
             {
-                _logger.LogError("At least one additional input file must be specified");
-                return 1;
+                _logger.LogError("No input files specified");
+                return ExitCodes.ValidationError;
             }
 
-            foreach (var path in opts.InputPaths)
+            if (opts.InputFiles.Count() < 2)
+            {
+                _logger.LogError("At least two input files are required for merge operation");
+                return ExitCodes.ValidationError;
+            }
+
+            foreach (var path in opts.InputFiles)
             {
                 if (!File.Exists(path))
                 {
                     _logger.LogError("Input file not found: {Path}", path);
-                    return 1;
+                    return ExitCodes.ValidationError;
                 }
             }
 
-            // Validate merge type
+            // Merge 타입 검증
             if (!Enum.TryParse<MergeType>(opts.MergeType, true, out var mergeType))
             {
                 _logger.LogError("Invalid merge type: {Type}. Valid values are: {ValidValues}",
                     opts.MergeType, string.Join(", ", Enum.GetNames<MergeType>()));
-                return 1;
+                return ExitCodes.ValidationError;
             }
 
-            // Validate join type for horizontal merge
+            // Join 타입 검증 (Horizontal merge인 경우)
             JoinType joinType = JoinType.Inner;
             if (mergeType == MergeType.Horizontal)
             {
@@ -56,24 +62,20 @@ public class MergeHandler : ICommandHandler
                 {
                     _logger.LogError("Invalid join type: {Type}. Valid values are: {ValidValues}",
                         opts.JoinType, string.Join(", ", Enum.GetNames<JoinType>()));
-                    return 1;
+                    return ExitCodes.ValidationError;
                 }
 
-                // Key columns are required for horizontal merge
+                // Horizontal merge는 key columns가 필수
                 if (!opts.JoinKeyColumns.Any())
                 {
                     _logger.LogError("Key columns must be specified for horizontal merge");
-                    return 1;
+                    return ExitCodes.ValidationError;
                 }
             }
 
-            // Create input paths list including the main input file
-            var allInputPaths = new List<string> { opts.InputPath };
-            allInputPaths.AddRange(opts.InputPaths);
-
             var options = new MergeOption
             {
-                InputPaths = allInputPaths,
+                InputPaths = opts.InputFiles.ToList(),
                 MergeType = mergeType,
                 JoinType = joinType,
                 JoinKeyColumns = opts.JoinKeyColumns.ToList(),
@@ -82,21 +84,37 @@ public class MergeHandler : ICommandHandler
 
             var taskLogger = _loggerFactory.CreateLogger<MergeTask>();
             var task = new MergeTask(options, taskLogger);
+
             var context = new TaskContext
             {
-                InputPath = opts.InputPath,
+                InputPath = opts.InputFiles.First(), // 첫 번째 파일을 primary로 사용
                 OutputPath = opts.OutputPath
             };
 
-            _logger.LogInformation("Merging {Count} files using {Type} merge",
-                allInputPaths.Count, mergeType);
+            _logger.LogInformation("Starting merge operation with {Count} files using {Type} merge",
+                opts.InputFiles.Count(), mergeType);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
+            var result = await task.ExecuteAsync(context);
+
+            if (result)
+            {
+                _logger.LogInformation("Merge operation completed successfully");
+                return ExitCodes.Success;
+            }
+            else
+            {
+                _logger.LogError("Merge operation failed");
+                return ExitCodes.Error;
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error executing merge command");
-            return 1;
+            return ExitCodes.Error;
         }
     }
+
+    public string? GetExample() =>
+    "merge file1.csv file2.csv file3.csv -t Vertical -o merged.csv\n" +
+    "  merge customers1.csv customers2.csv -t Horizontal -k CustomerID -j Left -o merged_customers.csv";
 }

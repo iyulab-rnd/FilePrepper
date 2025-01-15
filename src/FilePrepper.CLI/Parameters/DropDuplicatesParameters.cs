@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("drop-duplicates", HelpText = "Remove duplicate rows")]
-public class DropDuplicatesParameters : BaseParameters
+public class DropDuplicatesParameters : SingleInputParameters
 {
     [Option("keep-first", Default = true,
         HelpText = "Keep first occurrence of duplicates instead of last")]

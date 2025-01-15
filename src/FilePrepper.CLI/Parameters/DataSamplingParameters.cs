@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("data-sampling", HelpText = "Sample data from the input file")]
-public class DataSamplingParameters : BaseParameters
+public class DataSamplingParameters : SingleInputParameters
 {
     [Option('m', "method", Required = true,
         HelpText = "Sampling method (Random/Systematic/Stratified)")]

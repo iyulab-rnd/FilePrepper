@@ -91,4 +91,7 @@ public class DateExtractionHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "extract-date -i input.csv -o output.csv -e \"OrderDate:Year,Month,Day:yyyy-MM-dd\"";
 }

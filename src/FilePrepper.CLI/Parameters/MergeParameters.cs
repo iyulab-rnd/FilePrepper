@@ -4,11 +4,11 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("merge", HelpText = "Merge multiple CSV files")]
-public class MergeParameters : BaseParameters
+public class MergeParameters : MultipleInputParameters
 {
-    [Option("inputs", Required = true, Separator = ',',
-        HelpText = "Additional input files to merge")]
-    public IEnumerable<string> InputPaths { get; set; } = Array.Empty<string>();
+    [Value(0, Required = true, Min = 2, MetaName = "inputs",
+        HelpText = "Input CSV files to merge (minimum 2 files required)")]
+    public IEnumerable<string> InputFiles { get; set; } = Array.Empty<string>();
 
     [Option('t', "type", Required = true,
         HelpText = "Merge type (Vertical/Horizontal)")]

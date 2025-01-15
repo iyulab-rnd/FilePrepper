@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("convert-format", HelpText = "Convert file format")]
-public class FileFormatConvertParameters : BaseParameters
+public class FileFormatConvertParameters : SingleInputParameters
 {
     [Option('t', "target", Required = true,
         HelpText = "Target format (CSV/TSV/PSV/JSON/XML)")]

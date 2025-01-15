@@ -72,4 +72,7 @@ public class DataSamplingHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "data-sampling -i input.csv -o output.csv -m Stratified --stratify Category -s 0.3 --seed 42";
 }

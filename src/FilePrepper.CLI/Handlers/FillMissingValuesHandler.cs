@@ -78,4 +78,7 @@ public class FillMissingValuesHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "fill-missing -i input.csv -o output.csv -m \"Age:Mean,Name:FixedValue:Unknown,Score:Median\"";
 }

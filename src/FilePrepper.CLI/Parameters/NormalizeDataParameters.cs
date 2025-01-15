@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("normalize", HelpText = "Normalize numeric columns")]
-public class NormalizeDataParameters : BaseParameters
+public class NormalizeDataParameters : SingleInputParameters
 {
     [Option('c', "columns", Required = true, Separator = ',',
         HelpText = "Columns to normalize")]

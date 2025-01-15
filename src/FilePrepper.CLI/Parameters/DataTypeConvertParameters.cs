@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("convert-type", HelpText = "Convert data types of columns")]
-public class DataTypeConvertParameters : BaseParameters
+public class DataTypeConvertParameters : SingleInputParameters
 {
     [Option('c', "conversions", Required = true, Separator = ',',
         HelpText = "Type conversions in format column:type[:format] (e.g. Date:DateTime:yyyy-MM-dd or Age:Integer)")]

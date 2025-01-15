@@ -77,4 +77,7 @@ public class ScaleDataHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "scale -i input.csv -o output.csv -s \"Price:MinMax,Score:Standardization\"";
 }

@@ -90,4 +90,7 @@ public class AggregateHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "aggregate -i input.csv -o output.csv -g \"Region,Category\" -a \"Sales:Sum:TotalSales,Price:Average:AvgPrice\"";
 }

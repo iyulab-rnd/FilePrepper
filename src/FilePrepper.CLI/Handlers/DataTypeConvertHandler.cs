@@ -87,4 +87,8 @@ public class DataTypeConvertHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "convert-type -i input.csv -o output.csv -c \"Date:DateTime:yyyy-MM-dd,Age:Integer\" --culture en-US";
+
 }

@@ -86,4 +86,7 @@ public class ValueReplaceHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "replace -i input.csv -o output.csv -r \"Status:active=1;inactive=0,Gender:M=Male;F=Female\"";
 }

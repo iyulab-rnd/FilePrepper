@@ -71,4 +71,7 @@ public class NormalizeDataHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "normalize -i input.csv -o output.csv -c \"Price,Quantity\" -m MinMax --min 0 --max 1";
 }

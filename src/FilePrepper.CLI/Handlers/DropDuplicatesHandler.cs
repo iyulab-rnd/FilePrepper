@@ -55,4 +55,7 @@ public class DropDuplicatesHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "drop-duplicates -i input.csv -o output.csv --subset-only -c \"Name,Department\" --keep-first";
 }

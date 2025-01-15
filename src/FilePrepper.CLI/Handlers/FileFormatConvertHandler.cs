@@ -87,4 +87,7 @@ public class FileFormatConvertHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "convert-format -i input.csv -o output.json -t JSON --pretty";
 }

@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("extract-date", HelpText = "Extract components from date columns")]
-public class DateExtractionParameters : BaseParameters
+public class DateExtractionParameters : SingleInputParameters
 {
     [Option('e', "extractions", Required = true, Separator = ',',
         HelpText = "Date extractions in format column:component1,component2[:format] (e.g. Date:Year,Month,Day:yyyy-MM-dd)")]

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using FilePrepper.CLI.Parameters;
 using FilePrepper.CLI.Handlers;
+using System.Reflection;
 
 namespace FilePrepper.CLI;
 
@@ -17,30 +18,80 @@ public static class ExitCodes
 
 public class Program
 {
-    private static readonly ILogger<Program> _logger;
+    private const string _toolCommandName = "fileprepper";
+
+    private static ILoggerFactory _loggerFactory;
+    private static ILogger<Program> _logger;
+
+    private static readonly Dictionary<string, string> _commandDescriptions = new()
+    {
+        { "add-columns", "Add new columns with specified values" },
+        { "aggregate", "Aggregate data based on grouping columns" },
+        { "stats", "Calculate basic statistics on numeric columns" },
+        { "column-interaction", "Perform operations between columns" },
+        { "data-sampling", "Sample data using various methods" },
+        { "convert-type", "Convert data types of columns" },
+        { "extract-date", "Extract components from date columns" },
+        { "drop-duplicates", "Remove duplicate rows" },
+        { "convert-format", "Convert file format (CSV/TSV/JSON/XML)" },
+        { "fill-missing", "Fill missing values using various methods" },
+        { "filter-rows", "Filter rows based on conditions" },
+        { "merge", "Merge multiple CSV files" },
+        { "normalize", "Normalize numeric columns" },
+        { "one-hot-encoding", "Perform one-hot encoding on categorical columns" },
+        { "remove-columns", "Remove specified columns" },
+        { "rename-columns", "Rename columns using mapping" },
+        { "reorder-columns", "Reorder columns in specified order" },
+        { "scale", "Scale numeric columns" },
+        { "replace", "Replace values in columns" }
+    };
 
     static Program()
     {
-        var loggerFactory = LoggerFactory.Create(builder =>
+        ConfigureLogging(LogLevel.Information);
+    }
+
+    private static void ConfigureLogging(LogLevel minLevel)
+    {
+        _loggerFactory = LoggerFactory.Create(builder =>
         {
             builder
                 .AddConsole()
-                .SetMinimumLevel(LogLevel.Information);
+                .SetMinimumLevel(minLevel);
         });
 
-        _logger = loggerFactory.CreateLogger<Program>();
+        _logger = _loggerFactory.CreateLogger<Program>();
     }
 
     static async Task<int> Main(string[] args)
     {
         try
         {
+#if DEBUG
+            // merge "D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_test.csv" "D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_train.csv" -t Vertical -o X_merged.csv
+            args = new string[7];
+            args[0] = "merge";
+            args[1] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_test.csv";
+            args[2] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_train.csv";
+            args[3] = "-t";
+            args[4] = "Vertical";
+            args[5] = "-o";
+            args[6] = "X_merged.csv";
+#endif
+
+            // 도움말 표시 시에는 로깅 레벨을 Error로 설정
+            if (args == null || args.Length == 0 || args[0] == "--help" || args[0] == "-h" ||
+                (args.Length >= 2 && args[1] == "--help"))
+            {
+                ConfigureLogging(LogLevel.Error);
+            }
+
             _logger.LogInformation("Application starting...");
 
-            if (args == null || args.Length == 0)
+            if (args == null || args.Length == 0 || args[0] == "--help" || args[0] == "-h")
             {
-                _logger.LogError("No arguments provided");
-                return ExitCodes.ValidationError;
+                ShowHelp();
+                return ExitCodes.Success;
             }
 
             var services = ConfigureServices();
@@ -48,7 +99,15 @@ public class Program
 
             _logger.LogInformation("Parsing command line arguments...");
 
-            return await Parser.Default.ParseArguments(args, types)
+            var parser = new Parser(config =>
+            {
+                config.HelpWriter = null;
+                config.EnableDashDash = true;
+            });
+
+            var parserResult = parser.ParseArguments(args, types);
+
+            return await parserResult
                 .MapResult(
                     async (ICommandParameters opts) =>
                     {
@@ -64,8 +123,15 @@ public class Program
                                 return ExitCodes.InvalidHandler;
                             }
 
-                            // 매개변수 유효성 검사
-                            if (!ValidateParameters(opts))
+                            if (args.Length >= 2 && args[1] == "--help")
+                            {
+                                var commandType = types.First(t => t.GetCustomAttribute<VerbAttribute>()?.Name == args[0]);
+                                ShowCommandHelp(args[0], commandType);
+                                return ExitCodes.Success;
+                            }
+
+                            // 기본 매개변수 검증
+                            if (opts is SingleInputParameters && !ValidateParameters(opts))
                             {
                                 _logger.LogError("Parameter validation failed");
                                 return ExitCodes.ValidationError;
@@ -77,12 +143,6 @@ public class Program
                             _logger.LogInformation($"Handler execution completed with result: {result}");
                             return result;
                         }
-                        catch (InvalidOperationException ex)
-                        {
-                            _logger.LogError($"Operation error: {ex.Message}");
-                            _logger.LogDebug(ex.StackTrace);
-                            return ExitCodes.InvalidHandler;
-                        }
                         catch (Exception ex)
                         {
                             _logger.LogError($"Unexpected error during handler execution: {ex.Message}");
@@ -92,18 +152,20 @@ public class Program
                     },
                     errors =>
                     {
-                        foreach (var error in errors)
+                        LogErrors(errors);
+
+                        string command = args[0];
+                        if (_commandDescriptions.ContainsKey(command))
                         {
-                            _logger.LogError($"Command line parsing error: {error}");
+                            var commandType = types.First(t => t.GetCustomAttribute<VerbAttribute>()?.Name == command);
+                            ShowCommandHelp(command, commandType);
+                        }
+                        else
+                        {
+                            ShowHelp();
                         }
                         return Task.FromResult(ExitCodes.ValidationError);
                     });
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError($"Configuration error: {ex.Message}");
-            _logger.LogDebug(ex.StackTrace);
-            return ExitCodes.ConfigurationError;
         }
         catch (Exception ex)
         {
@@ -111,10 +173,133 @@ public class Program
             _logger.LogDebug(ex.StackTrace);
             return ExitCodes.Error;
         }
-        finally
+    }
+
+    private static void LogErrors(IEnumerable<Error> errors)
+    {
+        errors.ToList().ForEach(error =>
         {
-            _logger.LogInformation("Application shutting down...");
+            if (error is MissingRequiredOptionError missingOptionError)
+            {
+                _logger.LogError($"Required option missing: {missingOptionError.NameInfo.NameText}");
+            }
+            else
+            {
+                _logger.LogError($"Error: {error.Tag} - {error}");
+            }
+        });
+    }
+
+    private static ServiceProvider ConfigureServices(LogLevel minLevel = LogLevel.Information)
+    {
+        _logger.LogInformation("Configuring services...");
+
+        try
+        {
+            var services = new ServiceCollection()
+                .AddLogging(builder =>
+                {
+                    builder
+                        .AddConsole()
+                        .SetMinimumLevel(minLevel);
+                })
+                .AddSingleton(_loggerFactory);
+
+            RegisterCommandHandlers(services);
+
+            var serviceProvider = services.BuildServiceProvider();
+            ValidateServiceConfiguration(serviceProvider);
+
+            return serviceProvider;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Service configuration failed: {ex.Message}");
+            throw new InvalidOperationException("Failed to configure services", ex);
+        }
+    }
+
+    private static string GetCommandExample(string command)
+    {
+        try
+        {
+            var services = ConfigureServices(LogLevel.Error);  // 로그 레벨을 Error로 설정
+            var commandType = LoadCommandTypes()
+                .FirstOrDefault(t => t.GetCustomAttribute<VerbAttribute>()?.Name == command);
+
+            if (commandType == null)
+                return $"  {_toolCommandName} {command} [options]";
+
+            var parameters = Activator.CreateInstance(commandType) as ICommandParameters;
+            if (parameters == null)
+                return $"  {_toolCommandName} {command} [options]";
+
+            var handlerType = parameters.GetHandlerType();
+            var handler = services.GetRequiredService(handlerType) as ICommandHandler;
+            if (handler == null)
+                return $"  {_toolCommandName} {command} [options]";
+
+            var example = handler.GetExample();
+            return example != null ? $"  {_toolCommandName} {example}" : $"  {_toolCommandName} {command} [options]";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Error getting command example");
+            return $"  {_toolCommandName} {command} [options]";
+        }
+    }
+
+    private static void ShowHelp()
+    {
+        Console.WriteLine("\nFilePrepper - CSV File Processing Tool");
+        Console.WriteLine("=====================================\n");
+        Console.WriteLine("Usage: FilePrepper <command> [options]\n");
+        Console.WriteLine("Available Commands:");
+        Console.WriteLine("------------------");
+
+        var maxCommandLength = _commandDescriptions.Keys.Max(k => k.Length);
+        foreach (var command in _commandDescriptions.OrderBy(x => x.Key))
+        {
+            Console.WriteLine($"  {command.Key.PadRight(maxCommandLength + 2)} {command.Value}");
+        }
+
+        Console.WriteLine("\nFor detailed help on a specific command, use:");
+        Console.WriteLine("  FilePrepper <command> --help");
+        Console.WriteLine("  Example: FilePrepper aggregate --help\n");
+    }
+
+    private static void ShowCommandHelp(string command, Type commandType)
+    {
+        ConfigureLogging(LogLevel.Error); // 로그 레벨을 Error로 설정
+
+        var verbAttribute = commandType.GetCustomAttribute<VerbAttribute>();
+        Console.WriteLine($"\nCommand: {command}");
+        Console.WriteLine($"Description: {verbAttribute?.HelpText ?? _commandDescriptions[command]}");
+        Console.WriteLine("\nOptions:");
+
+        var properties = commandType.GetProperties()
+            .Where(p => p.GetCustomAttribute<OptionAttribute>() != null)
+            .OrderBy(p => p.GetCustomAttribute<OptionAttribute>()?.Required == true ? 0 : 1);
+
+        foreach (var prop in properties)
+        {
+            var opt = prop.GetCustomAttribute<OptionAttribute>();
+            if (opt == null) continue;
+
+            var shortName = !string.IsNullOrEmpty(opt.ShortName) ? $"-{opt.ShortName}," : "   ";
+            var longName = $"--{opt.LongName}";
+            var required = opt.Required ? " [required]" : "";
+
+            Console.WriteLine($"  {shortName} {longName.PadRight(20)} {opt.HelpText}{required}");
+
+            if (opt.Default != null && opt.Default.ToString() != "")
+            {
+                Console.WriteLine($"      Default: {opt.Default}");
+            }
+        }
+
+        Console.WriteLine("\nExample:");
+        Console.WriteLine(GetCommandExample(command));
     }
 
     private static ServiceProvider ConfigureServices()
@@ -221,44 +406,51 @@ public class Program
 
         try
         {
-            // 기본 매개변수 검증
-            if (parameters is BaseParameters baseParams)
+            // SingleInputParameters 검증
+            if (parameters is SingleInputParameters singleInputParams)
             {
                 // 입력 파일 검증
-                if (string.IsNullOrEmpty(baseParams.InputPath))
+                if (string.IsNullOrEmpty(singleInputParams.InputPath))
                 {
                     _logger.LogError("Input path is not specified");
                     return false;
                 }
 
                 // 경로 주입 방지
-                if (baseParams.InputPath.Contains("..") || baseParams.InputPath.Contains("~"))
+                if (singleInputParams.InputPath.Contains("..") || singleInputParams.InputPath.Contains("~"))
                 {
                     _logger.LogError("Suspicious input path detected");
                     return false;
                 }
 
                 // 입력 파일 존재 여부 확인
-                if (!File.Exists(baseParams.InputPath))
+                if (!File.Exists(singleInputParams.InputPath))
                 {
-                    _logger.LogError($"Input file does not exist: {baseParams.InputPath}");
+                    _logger.LogError($"Input file does not exist: {singleInputParams.InputPath}");
                     return false;
                 }
+            }
+            // MultipleInputParameters는 각 Handler에서 검증하므로 여기서는 처리하지 않음
 
-                // 출력 경로 검증
-                if (string.IsNullOrEmpty(baseParams.OutputPath))
-                {
-                    _logger.LogError("Output path is not specified");
-                    return false;
-                }
+            // 모든 Parameters 타입에 대한 공통 출력 경로 검증
+            string? outputPath = null;
+            if (parameters is SingleInputParameters single)
+                outputPath = single.OutputPath;
+            else if (parameters is MultipleInputParameters multiple)
+                outputPath = multiple.OutputPath;
 
-                // 출력 디렉토리 존재 여부 확인
-                var outputDir = Path.GetDirectoryName(baseParams.OutputPath);
-                if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-                {
-                    _logger.LogError($"Output directory does not exist: {outputDir}");
-                    return false;
-                }
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                _logger.LogError("Output path is not specified");
+                return false;
+            }
+
+            // 출력 디렉토리 존재 여부 확인
+            var outputDir = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            {
+                _logger.LogError($"Output directory does not exist: {outputDir}");
+                return false;
             }
 
             return true;
@@ -269,4 +461,5 @@ public class Program
             return false;
         }
     }
+
 }

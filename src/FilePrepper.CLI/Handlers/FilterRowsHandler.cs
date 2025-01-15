@@ -71,4 +71,7 @@ public class FilterRowsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "filter-rows -i input.csv -o output.csv -c \"Age:GreaterThan:30,Status:Equals:Active\"";
 }

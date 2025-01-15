@@ -58,4 +58,6 @@ public class AddColumnsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() => "add-columns -i input.csv -o output.csv -c \"Age=30,City=Seoul\"";
 }

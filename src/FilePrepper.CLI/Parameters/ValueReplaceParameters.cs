@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("replace", HelpText = "Replace values in columns")]
-public class ValueReplaceParameters : BaseParameters
+public class ValueReplaceParameters : SingleInputParameters
 {
     [Option('r', "replacements", Required = true, Separator = ',',
         HelpText = "Replacement rules in format column:oldValue=newValue[;oldValue2=newValue2] (e.g. Status:active=1;inactive=0)")]

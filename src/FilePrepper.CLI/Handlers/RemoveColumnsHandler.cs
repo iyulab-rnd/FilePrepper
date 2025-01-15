@@ -60,4 +60,7 @@ public class RemoveColumnsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "remove-columns -i input.csv -o output.csv -c \"TempColumn1,TempColumn2\"";
 }

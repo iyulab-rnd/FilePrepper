@@ -83,4 +83,7 @@ public class BasicStatisticsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "stats -i input.csv -o output.csv -c \"Price,Quantity\" -s \"Mean,Median,StandardDeviation\"";
 }

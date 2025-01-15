@@ -71,4 +71,7 @@ public class ColumnInteractionHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "column-interaction -i input.csv -o output.csv -s \"Price,Quantity\" -t Multiply -o Total";
 }

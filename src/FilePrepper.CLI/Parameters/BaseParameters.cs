@@ -3,14 +3,11 @@ using FilePrepper.Tasks;
 
 namespace FilePrepper.CLI.Parameters;
 
+/// <summary>
+/// 에러 처리와 기타 공통 옵션을 포함하는 기본 클래스
+/// </summary>
 public abstract class BaseParameters : ICommandParameters
 {
-    [Option('i', "input", Required = true, HelpText = "Input file path")]
-    public string InputPath { get; set; } = string.Empty;
-
-    [Option('o', "output", Required = true, HelpText = "Output file path")]
-    public string OutputPath { get; set; } = string.Empty;
-
     [Option("ignore-errors", Required = false, Default = false,
         HelpText = "Whether to ignore errors during processing")]
     public bool IgnoreErrors { get; set; }
@@ -21,7 +18,7 @@ public abstract class BaseParameters : ICommandParameters
 
     public abstract Type GetHandlerType();
 
-    public CommonTaskOptions GetCommonOptions() => new()
+    public virtual CommonTaskOptions GetCommonOptions() => new()
     {
         ErrorHandling = new()
         {

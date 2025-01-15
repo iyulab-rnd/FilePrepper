@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("one-hot-encoding", HelpText = "Perform one-hot encoding on categorical columns")]
-public class OneHotEncodingParameters : BaseParameters
+public class OneHotEncodingParameters : SingleInputParameters
 {
     [Option('c', "columns", Required = true, Separator = ',',
         HelpText = "Columns to encode")]

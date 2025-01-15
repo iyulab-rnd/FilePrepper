@@ -54,4 +54,7 @@ public class OneHotEncodingHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "one-hot-encoding -i input.csv -o output.csv -c \"Category,Status\" --keep-original";
 }

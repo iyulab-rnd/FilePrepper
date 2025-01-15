@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("column-interaction", HelpText = "Perform operations between columns")]
-public class ColumnInteractionParameters : BaseParameters
+public class ColumnInteractionParameters : SingleInputParameters
 {
     [Option('s', "source", Required = true, Separator = ',',
         HelpText = "Source columns to use in operation")]

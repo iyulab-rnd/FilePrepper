@@ -65,4 +65,7 @@ public class RenameColumnsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "rename-columns -i input.csv -o output.csv -m \"OldName:NewName,Price:Cost\"";
 }

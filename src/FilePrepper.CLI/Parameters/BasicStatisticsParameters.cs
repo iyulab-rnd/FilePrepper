@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("stats", HelpText = "Calculate basic statistics on columns")]
-public class BasicStatisticsParameters : BaseParameters
+public class BasicStatisticsParameters : SingleInputParameters
 {
     [Option('c', "columns", Required = true, Separator = ',',
         HelpText = "Columns to calculate statistics for")]

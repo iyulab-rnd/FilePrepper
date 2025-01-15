@@ -46,4 +46,7 @@ public class ReorderColumnsHandler : ICommandHandler
             return 1;
         }
     }
+
+    public string? GetExample() =>
+    "reorder-columns -i input.csv -o output.csv -o \"ID,Name,Age,Score\"";
 }

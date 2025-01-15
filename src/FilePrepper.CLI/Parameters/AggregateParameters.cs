@@ -4,7 +4,7 @@ using FilePrepper.CLI.Handlers;
 namespace FilePrepper.CLI.Parameters;
 
 [Verb("aggregate", HelpText = "Aggregate data based on group by columns")]
-public class AggregateParameters : BaseParameters
+public class AggregateParameters : SingleInputParameters
 {
     [Option('g', "group-by", Required = true, Separator = ',',
         HelpText = "Columns to group by")]
