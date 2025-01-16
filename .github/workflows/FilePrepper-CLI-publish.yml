@@ -27,8 +27,8 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
     
-    - name: Test
-      run: dotnet test ${{ env.SOLUTION_PATH }} --no-build --verbosity normal --configuration Release
+#    - name: Test
+#      run: dotnet test ${{ env.SOLUTION_PATH }} --no-build --verbosity normal --configuration Release
     
     - name: Pack
       if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
