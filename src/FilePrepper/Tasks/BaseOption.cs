@@ -3,6 +3,7 @@
 public abstract class BaseOption : ITaskOption
 {
     public CommonTaskOptions Common { get; set; } = new();
+    public bool HasHeader { get; set; } = true;
 
     public bool IsValid => Validate().Length == 0;
 

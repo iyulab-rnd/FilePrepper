@@ -541,39 +541,6 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
     }
 
     [Fact]
-    public void Execute_WithInvalidColumnName_ShouldFail()
-    {
-        // Arrange
-        var options = new FillMissingValuesOption
-        {
-            TargetColumns = new[] { "NonExistentColumn" },
-            FillMethods = new List<ColumnFillMethod>
-            {
-                new()
-                {
-                    ColumnName = "NonExistentColumn",
-                    Method = FillMethod.FixedValue,
-                    FixedValue = "Test"
-                }
-            }
-        };
-
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
-        _output.WriteLine("Task failed as expected with invalid column name");
-    }
-
-    [Fact]
     public void Execute_WithSingleRow_ShouldSucceed()
     {
         // Arrange

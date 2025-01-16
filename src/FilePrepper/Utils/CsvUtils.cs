@@ -4,11 +4,11 @@ namespace FilePrepper.Utils;
 
 public static class CsvUtils
 {
-    public static CsvConfiguration GetDefaultConfiguration()
+    public static CsvConfiguration GetDefaultConfiguration(bool hasHeader = true)
     {
         return new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            HasHeaderRecord = true,
+            HasHeaderRecord = hasHeader,
             MissingFieldFound = null
         };
     }

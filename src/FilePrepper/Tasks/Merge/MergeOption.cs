@@ -38,32 +38,20 @@ public enum JoinType
 
 public class MergeOption : BaseOption
 {
-    /// <summary>
-    /// 머지할 파일 경로 목록
-    /// </summary>
     public List<string> InputPaths { get; set; } = new();
-
-    /// <summary>
-    /// 세로(Union)로 머지할지, 가로(Join)으로 머지할지
-    /// </summary>
     public MergeType MergeType { get; set; } = MergeType.Vertical;
-
-    /// <summary>
-    /// MergeType이 Horizontal일 때, JoinType(Inner, Left, Right, Full 등)을 설정
-    /// </summary>
     public JoinType JoinType { get; set; } = JoinType.Inner;
+    public List<ColumnIdentifier> JoinKeyColumns { get; set; } = new();
+    public bool StrictColumnCount { get; set; }
+    public bool HasHeader { get; set; } = true;
 
-    /// <summary>
-    /// MergeType이 Horizontal일 때, Join 키로 사용할 컬럼 리스트 (복수 키 조합 가능)
-    /// </summary>
-    public List<string> JoinKeyColumns { get; set; } = new();
 
     protected override string[] ValidateInternal()
     {
         var errors = new List<string>();
 
         // 1) 파일 리스트 검증
-        if (InputPaths.Count < 2)
+        if (InputPaths == null || InputPaths.Count < 2)
         {
             errors.Add("At least two input files must be specified for merging.");
         }
@@ -75,15 +63,38 @@ public class MergeOption : BaseOption
                 {
                     errors.Add($"Input path at index {i} cannot be empty or whitespace.");
                 }
+                else if (!File.Exists(InputPaths[i]))
+                {
+                    errors.Add($"Input file does not exist: {InputPaths[i]}");
+                }
             }
         }
 
-        // 2) Horizontal Merge 시, JoinKeyColumns가 적어도 1개 이상 필요
-        if (MergeType == MergeType.Horizontal && JoinKeyColumns.Count == 0)
+        // 2) Join Key가 지정된 경우에만 JoinType 관련 검증
+        if (JoinKeyColumns?.Count > 0)
         {
-            errors.Add("At least one join key column must be specified for horizontal merge.");
+            if (MergeType != MergeType.Horizontal)
+            {
+                errors.Add("Join key columns can only be specified for horizontal merge.");
+            }
+            else
+            {
+                // Join Key Column 유효성 검증
+                for (int i = 0; i < JoinKeyColumns.Count; i++)
+                {
+                    var keyCol = JoinKeyColumns[i];
+                    if (!keyCol.IsValid)
+                    {
+                        errors.Add($"Join key column at index {i} must specify either Name or Index.");
+                    }
+                    if (keyCol.Index.HasValue && keyCol.Index.Value < 0)
+                    {
+                        errors.Add($"Join key column index at position {i} cannot be negative.");
+                    }
+                }
+            }
         }
 
-        return [.. errors];
+        return errors.ToArray();
     }
 }

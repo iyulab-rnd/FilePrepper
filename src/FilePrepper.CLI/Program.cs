@@ -1,9 +1,8 @@
 ﻿using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Parameters;
-using FilePrepper.CLI.Handlers;
 using System.Reflection;
+using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI;
 
@@ -48,7 +47,7 @@ public class Program
 
     static Program()
     {
-        ConfigureLogging(LogLevel.Information);
+        ConfigureLogging(LogLevel.Error);
     }
 
     private static void ConfigureLogging(LogLevel minLevel)
@@ -68,15 +67,14 @@ public class Program
         try
         {
 #if DEBUG
-            // merge "D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_test.csv" "D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_train.csv" -t Vertical -o X_merged.csv
-            args = new string[7];
-            args[0] = "merge";
-            args[1] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_test.csv";
-            args[2] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_train.csv";
-            args[3] = "-t";
-            args[4] = "Vertical";
-            args[5] = "-o";
-            args[6] = "X_merged.csv";
+            //args = new string[7];
+            //args[0] = "merge";
+            //args[1] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_test.csv";
+            //args[2] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_train.csv";
+            //args[3] = "-t";
+            //args[4] = "Vertical";
+            //args[5] = "-o";
+            //args[6] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_merged.csv";
 #endif
 
             // 도움말 표시 시에는 로깅 레벨을 Error로 설정
@@ -404,62 +402,7 @@ public class Program
             return false;
         }
 
-        try
-        {
-            // SingleInputParameters 검증
-            if (parameters is SingleInputParameters singleInputParams)
-            {
-                // 입력 파일 검증
-                if (string.IsNullOrEmpty(singleInputParams.InputPath))
-                {
-                    _logger.LogError("Input path is not specified");
-                    return false;
-                }
-
-                // 경로 주입 방지
-                if (singleInputParams.InputPath.Contains("..") || singleInputParams.InputPath.Contains("~"))
-                {
-                    _logger.LogError("Suspicious input path detected");
-                    return false;
-                }
-
-                // 입력 파일 존재 여부 확인
-                if (!File.Exists(singleInputParams.InputPath))
-                {
-                    _logger.LogError($"Input file does not exist: {singleInputParams.InputPath}");
-                    return false;
-                }
-            }
-            // MultipleInputParameters는 각 Handler에서 검증하므로 여기서는 처리하지 않음
-
-            // 모든 Parameters 타입에 대한 공통 출력 경로 검증
-            string? outputPath = null;
-            if (parameters is SingleInputParameters single)
-                outputPath = single.OutputPath;
-            else if (parameters is MultipleInputParameters multiple)
-                outputPath = multiple.OutputPath;
-
-            if (string.IsNullOrEmpty(outputPath))
-            {
-                _logger.LogError("Output path is not specified");
-                return false;
-            }
-
-            // 출력 디렉토리 존재 여부 확인
-            var outputDir = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-            {
-                _logger.LogError($"Output directory does not exist: {outputDir}");
-                return false;
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Parameter validation error: {ex.Message}");
-            return false;
-        }
+        return parameters.Validate(_logger);
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tasks;
 
@@ -45,8 +46,13 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
                 var missingColumns = requiredColumns.Where(col => !headers.Contains(col)).ToList();
                 if (missingColumns.Count != 0)
                 {
-                    _logger.LogError("Required columns not found: {Columns}", string.Join(", ", missingColumns));
-                    return false;
+                    var error = $"Required columns not found: {string.Join(", ", missingColumns)}";
+                    _logger.LogError(error);
+                    if (!Options.Common.ErrorHandling.IgnoreErrors)
+                    {
+                        throw new ValidationException(error, ValidationExceptionErrorCode.General);
+                    }
+                    return true;
                 }
             }
 
@@ -55,15 +61,24 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
             await PostProcessAndWriteAsync(records, context);
             return true;
         }
+        catch (ValidationException ex)
+        {
+            if (Options.Common.ErrorHandling.IgnoreErrors)
+            {
+                _logger.LogWarning(ex, "Validation error ignored in {TaskName} task: {Message}", Name, ex.Message);
+                return true;
+            }
+            _logger.LogError(ex, "Validation error in {TaskName} task: {Message}", Name, ex.Message);
+            throw; // ValidationException은 다시 throw
+        }
         catch (Exception ex)
         {
             if (Options.Common.ErrorHandling.IgnoreErrors)
             {
-                _logger.LogWarning(ex, "Error ignored in {TaskName} task", Name);
+                _logger.LogWarning(ex, "Error ignored in {TaskName} task: {Message}", Name, ex.Message);
                 return true;
             }
-
-            _logger.LogError(ex, "Error executing {TaskName} task", Name);
+            _logger.LogError(ex, "Error executing {TaskName} task: {Message}", Name, ex.Message);
             return false;
         }
     }
@@ -94,33 +109,39 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     protected virtual IEnumerable<string> GetRequiredColumns() =>
         Options is BaseColumnOption columnOption ? columnOption.TargetColumns : Array.Empty<string>();
 
-    protected virtual async Task<(List<Dictionary<string, string>>, List<string>)> ReadCsvFileAsync(
-        string filePath,
-        IEnumerable<string>? requiredColumns = null)
+    protected virtual async Task<(List<Dictionary<string, string>> records, List<string> headers)> ReadCsvFileAsync(string path)
     {
-        using var reader = new StreamReader(filePath);
-        using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
+        _logger.LogInformation("Reading input file: {Path}", path);
 
-        await csv.ReadAsync();
-        csv.ReadHeader();
-        var headers = csv.HeaderRecord?.ToList() ?? new List<string>();
+        using var reader = new StreamReader(path);
+        using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration(Options.HasHeader));
 
-        if (requiredColumns != null)
+        var records = new List<Dictionary<string, string>>();
+        var headers = new List<string>();
+
+        if (Options.HasHeader)
         {
-            var headerErrors = CsvUtils.ValidateHeaders(requiredColumns, headers);
-            if (headerErrors.Count != 0)
+            await csv.ReadAsync();
+            csv.ReadHeader();
+            headers.AddRange(csv.HeaderRecord);
+        }
+        else
+        {
+            // 헤더 없는 경우 첫 줄을 읽어서 컬럼 수 파악
+            if (await csv.ReadAsync())
             {
-                throw new ValidationException(string.Join(", ", headerErrors));
+                var fieldCount = csv.Parser.RawRecord.Count(c => c == ',') + 1;
+                headers.AddRange(Enumerable.Range(0, fieldCount).Select(i => i.ToString()));
             }
         }
 
-        var records = new List<Dictionary<string, string>>();
+        // 레코드 읽기
         while (await csv.ReadAsync())
         {
             var record = new Dictionary<string, string>();
-            foreach (var header in headers)
+            for (int i = 0; i < headers.Count; i++)
             {
-                record[header] = csv.GetField(header) ?? string.Empty;
+                record[headers[i]] = csv.GetField(i) ?? string.Empty;
             }
             records.Add(record);
         }

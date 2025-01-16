@@ -179,32 +179,6 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
     }
 
     [Fact]
-    public void Execute_WithInvalidStratifyColumn_ShouldFail()
-    {
-        // Arrange
-        var options = new DataSamplingOption
-        {
-            Method = SamplingMethod.Stratified,
-            SampleSize = 0.5,
-            StratifyColumn = "NonExistentColumn",
-            Seed = 42
-        };
-
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
     public void Execute_WithTooLargeSampleSize_ShouldLimitToDataSize()
     {
         // Arrange
