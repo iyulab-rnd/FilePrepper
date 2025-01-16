@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMissingValuesValidator>
+public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 {
     public FillMissingValuesTests(ITestOutputHelper output) : base(output)
     {

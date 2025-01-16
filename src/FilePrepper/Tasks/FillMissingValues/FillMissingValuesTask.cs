@@ -309,4 +309,21 @@ public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
     {
         return Options.FillMethods.Select(m => m.ColumnName).Union(Options.TargetColumns);
     }
+
+    protected override string[] ValidateTaskSpecific(TaskContext context)
+    {
+        var errors = new List<string>();
+        var headers = GetFileHeaders(context.InputPath);
+
+        // 모든 타겟 컬럼이 존재하는지 검증
+        foreach (var method in Options.FillMethods)
+        {
+            if (!headers.Contains(method.ColumnName))
+            {
+                errors.Add($"Column '{method.ColumnName}' specified in FillMethods not found in file");
+            }
+        }
+
+        return [.. errors];
+    }
 }

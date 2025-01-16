@@ -6,7 +6,7 @@ using FilePrepper.Tasks;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class FilterRowsTests : TaskBaseTest<FilterRowsTask, FilterRowsValidator>
+public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
 {
     public FilterRowsTests(ITestOutputHelper output) : base(output)
     {

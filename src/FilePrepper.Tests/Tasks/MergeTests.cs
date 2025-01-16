@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class MergeTests : TaskBaseTest<MergeTask, MergeValidator>
+public class MergeTests : TaskBaseTest<MergeTask>
 {
     public MergeTests(ITestOutputHelper output) : base(output) { }
 

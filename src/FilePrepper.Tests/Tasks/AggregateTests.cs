@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
+public class AggregateTests : TaskBaseTest<AggregateTask>
 {
     public AggregateTests(ITestOutputHelper output) : base(output)
     {

@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, ColumnInteractionValidator>
+public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
 {
     public ColumnInteractionTests(ITestOutputHelper output) : base(output)
     {

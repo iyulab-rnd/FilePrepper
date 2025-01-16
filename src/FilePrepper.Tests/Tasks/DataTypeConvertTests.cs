@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeConvertValidator>
+public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
 {
     public DataTypeConvertTests(ITestOutputHelper output) : base(output)
     {

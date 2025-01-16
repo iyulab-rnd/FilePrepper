@@ -1,4 +1,4 @@
-﻿namespace FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
 
 public abstract class BaseOption : ITaskOption
 {
@@ -10,11 +10,19 @@ public abstract class BaseOption : ITaskOption
     public virtual string[] Validate()
     {
         var errors = new List<string>();
-
-        // IColumnOption 검증은 BaseColumnOption으로 이동
+        errors.AddRange(ValidateCommon());
         errors.AddRange(ValidateInternal());
-
         return [.. errors];
+    }
+
+    protected virtual string[] ValidateCommon()
+    {
+        var errors = new List<string>();
+        if (Common == null)
+        {
+            errors.Add("Common options cannot be null");
+        }
+        return errors.ToArray();
     }
 
     protected abstract string[] ValidateInternal();

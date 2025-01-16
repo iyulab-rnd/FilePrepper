@@ -293,4 +293,24 @@ public class MergeTask : BaseTask<MergeOption>
         }
         return newHeader;
     }
+
+    protected override string[] ValidateTaskSpecific(TaskContext context)
+    {
+        var errors = new List<string>();
+
+        // Merge 특화 검증 로직
+        if (Options.MergeType == MergeType.Horizontal &&
+            Options.JoinKeyColumns?.Count > 0)
+        {
+            foreach (var keyCol in Options.JoinKeyColumns)
+            {
+                if (!keyCol.IsValid)
+                {
+                    errors.Add($"Invalid join key column configuration");
+                }
+            }
+        }
+
+        return [.. errors];
+    }
 }

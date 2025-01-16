@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class ScaleDataTests : TaskBaseTest<ScaleDataTask, ScaleDataValidator>
+public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
 {
     public ScaleDataTests(ITestOutputHelper output) : base(output)
     {

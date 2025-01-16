@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStatisticsValidator>
+public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
 {
     public BasicStatisticsTests(ITestOutputHelper output) : base(output)
     {
@@ -51,7 +51,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
         var task = new BasicStatisticsTask(_mockLogger.Object);
         var context = new TaskContext(options)
         {
-            
+
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
         };
@@ -99,7 +99,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
         var context = new TaskContext(options)
-        {   
+        {
             InputPath = outlierDataPath,
             OutputPath = _testOutputPath
         };
@@ -152,7 +152,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
         var task = new BasicStatisticsTask(_mockLogger.Object);
         var context = new TaskContext(options)
         {
-            
+
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -189,7 +189,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
         var task = new BasicStatisticsTask(_mockLogger.Object);
         var context = new TaskContext(options)
         {
-            
+
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -227,7 +227,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
         var task = new BasicStatisticsTask(_mockLogger.Object);
         var context = new TaskContext(options)
         {
-            
+
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -331,26 +331,4 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
         Assert.Contains("Value_stat_StandardDeviation", lines[0]);
         Assert.Contains("Value_stat_ZScore", lines[0]);
     }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public void Validate_WithInvalidColumnName_ShouldThrowValidationException(string? columnName)
-    {
-        // Arrange
-        var options = new BasicStatisticsOption
-        {
-            TargetColumns = columnName != null ? new[] { columnName } : Array.Empty<string>(),
-            Statistics = new[] { StatisticType.Mean }
-        };
-
-        var validatorLogger = new Mock<ILogger<BasicStatisticsValidator>>();
-        var validator = new BasicStatisticsValidator(validatorLogger.Object);
-
-        // Act & Assert
-        // 검증 실패 시 ValidationException이 발생해야 함
-        var ex = Assert.Throws<ValidationException>(() => validator.ValidateOrThrow(options));
-    }
-
 }

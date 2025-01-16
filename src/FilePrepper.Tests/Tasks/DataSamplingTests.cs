@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingValidator>
+public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
 {
     public DataSamplingTests(ITestOutputHelper output) : base(output)
     {

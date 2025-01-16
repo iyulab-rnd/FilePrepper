@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask, OneHotEncodingValidator>
+public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
 {
     public OneHotEncodingTests(ITestOutputHelper output) : base(output)
     {

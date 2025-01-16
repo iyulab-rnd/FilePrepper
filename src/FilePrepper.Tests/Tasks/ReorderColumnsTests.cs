@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask, ReorderColumnsValidator>
+public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask>
 {
     public ReorderColumnsTests(ITestOutputHelper output) : base(output) { }
 

@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask, DropDuplicatesValidator>
+public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 {
     public DropDuplicatesTests(ITestOutputHelper output) : base(output)
     {

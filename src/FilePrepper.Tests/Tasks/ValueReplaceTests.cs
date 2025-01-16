@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask, ValueReplaceValidator>
+public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
 {
     public ValueReplaceTests(ITestOutputHelper output) : base(output)
     {

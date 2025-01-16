@@ -10,7 +10,6 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     protected List<string> _originalHeaders = [];
     private TaskContext _context;
 
-    // Options 프로퍼티를 안전하게 수정
     protected TOption Options
     {
         get
@@ -39,68 +38,96 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
 
         try
         {
-            var validationErrors = context.Options.Validate();
-            if (validationErrors.Length != 0)
+            // 검증 수행
+            if (!ValidateTask(context, out var validationErrors))
             {
-                var error = $"Validation errors in {Name} task: {string.Join(", ", validationErrors)}";
-                _logger.LogError(error);
+                var errorMessage = $"Validation errors in {Name} task: {string.Join(", ", validationErrors)}";
+                _logger.LogError(errorMessage);
+
                 if (!Options.Common.ErrorHandling.IgnoreErrors)
                 {
-                    throw new ValidationException(error, ValidationExceptionErrorCode.General);
+                    throw new ValidationException(errorMessage, ValidationExceptionErrorCode.General);
                 }
                 return false;
             }
 
-            var requiredColumns = GetRequiredColumns().ToList();
-
-            // MergeTask는 필수 컬럼 검증을 건너뜁니다
-            if (requiredColumns.Count != 0 && this is not MergeTask)
-            {
-                using var reader = new StreamReader(context.InputPath);
-                using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
-
-                await csv.ReadAsync();
-                csv.ReadHeader();
-                var headers = csv.HeaderRecord?.ToList() ?? new List<string>();
-
-                var missingColumns = requiredColumns.Where(col => !headers.Contains(col)).ToList();
-                if (missingColumns.Count != 0)
-                {
-                    var error = $"Required columns not found: {string.Join(", ", missingColumns)}";
-                    _logger.LogError(error);
-                    if (!Options.Common.ErrorHandling.IgnoreErrors)
-                    {
-                        throw new ValidationException(error, ValidationExceptionErrorCode.General);
-                    }
-                    return true;
-                }
-            }
-
+            // 실행
             var records = await ReadAndPreProcessAsync(context);
             records = await ProcessRecordsAsync(records);
             await PostProcessAndWriteAsync(records, context);
             return true;
         }
-        catch (ValidationException ex)
-        {
-            if (Options.Common.ErrorHandling.IgnoreErrors)
-            {
-                _logger.LogWarning(ex, "Validation error ignored in {TaskName} task: {Message}", Name, ex.Message);
-                return true;
-            }
-            _logger.LogError(ex, "Validation error in {TaskName} task: {Message}", Name, ex.Message);
-            throw;
-        }
         catch (Exception ex)
         {
-            if (Options.Common.ErrorHandling.IgnoreErrors)
-            {
-                _logger.LogWarning(ex, "Error ignored in {TaskName} task: {Message}", Name, ex.Message);
-                return true;
-            }
-            _logger.LogError(ex, "Error executing {TaskName} task: {Message}", Name, ex.Message);
-            throw;
+            HandleTaskException(ex);
+            return false;
         }
+    }
+
+    protected virtual bool ValidateTask(TaskContext context, out string[] errors)
+    {
+        var errorList = new List<string>();
+
+        // 옵션 검증
+        errorList.AddRange(context.Options.Validate());
+
+        // 파일 존재 여부 검증
+        if (!File.Exists(context.InputPath))
+        {
+            errorList.Add($"Input file not found: {context.InputPath}");
+        }
+
+        // 필수 컬럼 검증 (MergeTask 제외)
+        var requiredColumns = GetRequiredColumns().ToList();
+        if (requiredColumns.Any() && !(this is MergeTask))
+        {
+            try
+            {
+                var headers = GetFileHeaders(context.InputPath);
+                var missingColumns = requiredColumns.Where(col => !headers.Contains(col)).ToList();
+                if (missingColumns.Any())
+                {
+                    errorList.Add($"Required columns not found: {string.Join(", ", missingColumns)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                errorList.Add($"Error reading file headers: {ex.Message}");
+            }
+        }
+
+        // Task별 추가 검증
+        errorList.AddRange(ValidateTaskSpecific(context));
+
+        errors = [.. errorList];
+        return !errors.Any();
+    }
+
+    protected virtual string[] ValidateTaskSpecific(TaskContext context)
+    {
+        return Array.Empty<string>();
+    }
+
+    protected List<string> GetFileHeaders(string inputPath)
+    {
+        using var reader = new StreamReader(inputPath);
+        using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
+
+        csv.Read();
+        csv.ReadHeader();
+        return csv.HeaderRecord?.ToList() ?? new List<string>();
+    }
+
+    private void HandleTaskException(Exception ex)
+    {
+        if (Options.Common.ErrorHandling.IgnoreErrors)
+        {
+            _logger.LogWarning(ex, "Error ignored in {TaskName} task: {Message}", Name, ex.Message);
+            return;
+        }
+
+        _logger.LogError(ex, "Error executing {TaskName} task: {Message}", Name, ex.Message);
+        throw ex;
     }
 
     public bool Execute(TaskContext context)
@@ -116,14 +143,14 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         return await PreProcessRecordsAsync(records);
     }
 
+    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
+        List<Dictionary<string, string>> records);
+
     protected virtual Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
         List<Dictionary<string, string>> records)
     {
         return Task.FromResult(records);
     }
-
-    protected abstract Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
-        List<Dictionary<string, string>> records);
 
     protected virtual Task<List<Dictionary<string, string>>> PostProcessRecordsAsync(
         List<Dictionary<string, string>> records)

@@ -4,12 +4,10 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests;
 
-public abstract class TaskBaseTest<TTask, TValidator> : BaseTests
+public abstract class TaskBaseTest<TTask> : BaseTests
     where TTask : class
-    where TValidator : class
 {
     protected readonly Mock<ILogger<TTask>> _mockLogger;
-    protected readonly Mock<ILogger<TValidator>> _mockValidatorLogger;
     protected readonly string _testInputPath = Path.GetTempFileName();
     protected readonly string _testOutputPath = Path.GetTempFileName();
 
@@ -17,33 +15,6 @@ public abstract class TaskBaseTest<TTask, TValidator> : BaseTests
     {
         _mockLogger = new Mock<ILogger<TTask>>();
         _mockLogger
-            .Setup(logger => logger.Log(
-                It.IsAny<LogLevel>(),
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Callback(new InvocationAction(invocation =>
-            {
-                var logLevel = (LogLevel)invocation.Arguments[0];
-                var eventId = (EventId)invocation.Arguments[1];
-                var state = invocation.Arguments[2];
-                var exception = (Exception)invocation.Arguments[3];
-                var formatter = invocation.Arguments[4];
-
-                if (state != null && formatter != null)
-                {
-                    var formatterDelegate = formatter as Delegate;
-                    if (formatterDelegate != null)
-                    {
-                        var message = formatterDelegate.DynamicInvoke(state, exception);
-                        _output.WriteLine($"[{logLevel}] {message}");
-                    }
-                }
-            }));
-
-        _mockValidatorLogger = new Mock<ILogger<TValidator>>();
-        _mockValidatorLogger
             .Setup(logger => logger.Log(
                 It.IsAny<LogLevel>(),
                 It.IsAny<EventId>(),

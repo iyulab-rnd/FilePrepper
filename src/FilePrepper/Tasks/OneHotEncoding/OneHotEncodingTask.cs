@@ -90,4 +90,21 @@ public class OneHotEncodingTask : BaseTask<OneHotEncodingOption>
         // but if you do, you could return Options.TargetColumns.
         return Options.TargetColumns;
     }
+
+    protected override string[] ValidateTaskSpecific(TaskContext context)
+    {
+        var errors = new List<string>();
+        var headers = GetFileHeaders(context.InputPath);
+
+        // 타겟 컬럼 존재 여부 검증
+        foreach (var column in Options.TargetColumns)
+        {
+            if (!headers.Contains(column))
+            {
+                errors.Add($"Target column '{column}' not found in file");
+            }
+        }
+
+        return [.. errors];
+    }
 }

@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtractionValidator>
+public class DateExtractionTests : TaskBaseTest<DateExtractionTask>
 {
     public DateExtractionTests(ITestOutputHelper output) : base(output)
     {

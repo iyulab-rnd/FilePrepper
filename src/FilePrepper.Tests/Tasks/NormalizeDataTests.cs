@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataValidator>
+public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 {
     public NormalizeDataTests(ITestOutputHelper output) : base(output)
     {

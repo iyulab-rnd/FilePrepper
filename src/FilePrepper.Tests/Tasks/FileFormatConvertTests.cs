@@ -9,7 +9,7 @@ using FilePrepper.Tasks.FillMissingValues;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask, FileFormatConvertValidator>
+public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
 {
     public FileFormatConvertTests(ITestOutputHelper output) : base(output)
     {

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsValidator>
+public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
 {
     public RenameColumnsTests(ITestOutputHelper output) : base(output) { }
 

@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace FilePrepper.Tests.Tasks;
 
-public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
+public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
 {
     public AddColumnsTests(ITestOutputHelper output) : base(output)
     {
