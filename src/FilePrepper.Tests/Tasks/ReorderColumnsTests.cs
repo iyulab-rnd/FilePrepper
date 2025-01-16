@@ -40,8 +40,8 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask, ReorderColum
             Order = new List<string> { "B", "A" }
         };
 
-        var task = new ReorderColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ReorderColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -73,8 +73,8 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask, ReorderColum
             Order = new List<string> { "NotHere", "Y" }
         };
 
-        var task = new ReorderColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ReorderColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -99,8 +99,8 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask, ReorderColum
             Order = new List<string> { "C", "A" }
         };
 
-        var task = new ReorderColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext { InputPath = _testInputPath, OutputPath = _testOutputPath };
+        var task = new ReorderColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option) {  InputPath = _testInputPath, OutputPath = _testOutputPath };
 
         bool success = task.Execute(context);
         Assert.True(success);

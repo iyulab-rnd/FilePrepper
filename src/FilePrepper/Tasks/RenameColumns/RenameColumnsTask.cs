@@ -2,10 +2,7 @@
 
 public class RenameColumnsTask : BaseTask<RenameColumnsOption>
 {
-    public RenameColumnsTask(
-        RenameColumnsOption options,
-        ILogger<RenameColumnsTask> logger)
-        : base(options, logger)
+    public RenameColumnsTask(ILogger<RenameColumnsTask> logger) : base(logger)
     {
     }
 

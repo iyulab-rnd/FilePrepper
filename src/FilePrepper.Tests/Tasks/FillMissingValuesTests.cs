@@ -38,8 +38,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -82,8 +82,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -122,9 +122,10 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -161,8 +162,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -200,8 +201,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -239,8 +240,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -285,8 +286,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
         }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -329,8 +330,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
         };
 
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -374,8 +375,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -512,8 +513,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = testFile,
             OutputPath = _testOutputPath
@@ -563,8 +564,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask, FillMi
             }
         };
 
-        var task = new FillMissingValuesTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new FillMissingValuesTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = testFile,
             OutputPath = _testOutputPath

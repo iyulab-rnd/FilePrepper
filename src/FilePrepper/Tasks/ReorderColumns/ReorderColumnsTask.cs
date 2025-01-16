@@ -5,10 +5,7 @@ namespace FilePrepper.Tasks.ReorderColumns
 {
     public class ReorderColumnsTask : BaseTask<ReorderColumnsOption>
     {
-        public ReorderColumnsTask(
-            ReorderColumnsOption options,
-            ILogger<ReorderColumnsTask> logger)
-            : base(options, logger)
+        public ReorderColumnsTask(ILogger<ReorderColumnsTask> logger) : base(logger)
         {
         }
 

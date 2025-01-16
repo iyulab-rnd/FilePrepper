@@ -4,14 +4,32 @@ namespace FilePrepper.Tasks.Merge;
 
 public class MergeTask : BaseTask<MergeOption>
 {
-    private HashSet<string> _allHeaders = new();
+    private HashSet<string> _allHeaders = [];
+    private List<(List<Dictionary<string, string>> records, List<string> headers)> _allFilesData = new();
 
-    public MergeTask(MergeOption options, ILogger<MergeTask> logger) : base(options, logger)
+    public MergeTask(ILogger<MergeTask> logger) : base(logger)
     {
     }
 
+
+    protected override async Task<List<Dictionary<string, string>>> PreProcessRecordsAsync(
+        List<Dictionary<string, string>> records)
+    {
+        // 첫 번째 파일 데이터를 저장
+        _allFilesData.Add((records, _originalHeaders));
+
+        // 나머지 파일들을 읽어서 저장
+        for (int i = 1; i < Options.InputPaths.Count; i++)
+        {
+            var (otherRecords, headers) = await ReadCsvFileAsync(Options.InputPaths[i]);
+            _allFilesData.Add((otherRecords, headers));
+        }
+
+        return records; // 원본 records 반환
+    }
+
     protected override async Task<List<Dictionary<string, string>>> ProcessRecordsAsync(
-        List<Dictionary<string, string>> _ignoredBecauseMergeOptionUsesInputPathsDirectly)
+        List<Dictionary<string, string>> records)
     {
         try
         {
@@ -39,46 +57,42 @@ public class MergeTask : BaseTask<MergeOption>
         }
     }
 
-    private async Task<List<Dictionary<string, string>>> MergeVerticalAsync()
+    private Task<List<Dictionary<string, string>>> MergeVerticalAsync()
     {
         var allRecords = new List<Dictionary<string, string>>();
         _allHeaders = new HashSet<string>();
         int? expectedColumnCount = null;
 
-        foreach (var path in Options.InputPaths)
+        foreach (var (records, headers) in _allFilesData)
         {
-            try
+            // 세로 병합 시에는 모든 파일의 열 개수가 동일해야 함
+            if (expectedColumnCount == null)
             {
-                var (newRecords, headers) = await ReadCsvFileAsync(path);
-
-                // 세로 병합 시에는 모든 파일의 열 개수가 동일해야 함
-                if (expectedColumnCount == null)
-                {
-                    expectedColumnCount = headers.Count;
-                }
-                else if (headers.Count != expectedColumnCount)
-                {
-                    throw new ValidationException(
-                        $"Column count mismatch in {path}. Expected: {expectedColumnCount}, Actual: {headers.Count}",
-                        ValidationExceptionErrorCode.General);
-                }
-
-                headers.ForEach(h => _allHeaders.Add(h));
-                allRecords.AddRange(newRecords);
+                expectedColumnCount = headers.Count;
+                _logger.LogDebug("Set expected column count to {Count}", expectedColumnCount);
             }
-            catch (Exception ex) when (ex is not ValidationException)
+            else if (headers.Count != expectedColumnCount)
             {
-                throw new ValidationException(ex.Message, ValidationExceptionErrorCode.General);
+                throw new ValidationException(
+                    $"Column count mismatch. Expected: {expectedColumnCount}, Actual: {headers.Count}",
+                    ValidationExceptionErrorCode.General);
             }
+
+            headers.ForEach(h => _allHeaders.Add(h));
+            _logger.LogDebug("Current headers: {Headers}", string.Join(", ", _allHeaders));
+
+            allRecords.AddRange(records);
+            _logger.LogDebug("Total records after merge: {Count}", allRecords.Count);
         }
 
-        return allRecords;
+        _logger.LogInformation("Vertical merge completed. Total records: {Count}", allRecords.Count);
+        return Task.FromResult(allRecords);
     }
 
-    private async Task<List<Dictionary<string, string>>> MergeHorizontalAsync()
+    private Task<List<Dictionary<string, string>>> MergeHorizontalAsync()
     {
-        // 첫 번째 파일 읽기
-        var (records, headers) = await ReadCsvFileAsync(Options.InputPaths[0]);
+        // 첫 번째 파일의 데이터 가져오기
+        var (records, headers) = _allFilesData[0];
         var mergedRecords = records;
         _allHeaders = new HashSet<string>(headers);
 
@@ -87,26 +101,26 @@ public class MergeTask : BaseTask<MergeOption>
         {
             ValidateJoinKeyColumns(headers);
 
-            for (int i = 1; i < Options.InputPaths.Count; i++)
+            for (int i = 1; i < _allFilesData.Count; i++)
             {
-                var (rightRecords, rightHeaders) = await ReadCsvFileAsync(Options.InputPaths[i]);
+                var (rightRecords, rightHeaders) = _allFilesData[i];
                 ValidateJoinKeyColumns(rightHeaders);
 
                 mergedRecords = JoinTwoSets(mergedRecords, rightRecords);
             }
-            return mergedRecords;
+            return Task.FromResult(mergedRecords);
         }
 
         // Join Key가 없는 경우는 단순히 열 추가 (행 개수가 같아야 함)
-        for (int i = 1; i < Options.InputPaths.Count; i++)
+        for (int i = 1; i < _allFilesData.Count; i++)
         {
-            var (rightRecords, rightHeaders) = await ReadCsvFileAsync(Options.InputPaths[i]);
+            var (rightRecords, rightHeaders) = _allFilesData[i];
 
             // 행 개수가 같은지 검증
             if (rightRecords.Count != mergedRecords.Count)
             {
                 throw new ValidationException(
-                    $"Row count mismatch in {Options.InputPaths[i]}. " +
+                    $"Row count mismatch in file {i + 1}. " +
                     $"Expected: {mergedRecords.Count}, Actual: {rightRecords.Count}",
                     ValidationExceptionErrorCode.General);
             }
@@ -132,8 +146,11 @@ public class MergeTask : BaseTask<MergeOption>
             }
         }
 
-        return mergedRecords;
+        return Task.FromResult(mergedRecords);
     }
+
+    // MergeTask는 필수 컬럼 검증이 필요 없으므로 빈 배열 반환
+    protected override IEnumerable<string> GetRequiredColumns() => Array.Empty<string>();
 
     private List<Dictionary<string, string>> JoinTwoSets(
         List<Dictionary<string, string>> leftRecords,

@@ -2,10 +2,7 @@
 
 public class ScaleDataTask : BaseTask<ScaleDataOption>
 {
-    public ScaleDataTask(
-        ScaleDataOption options,
-        ILogger<ScaleDataTask> logger)
-        : base(options, logger)
+    public ScaleDataTask(ILogger<ScaleDataTask> logger) : base(logger)
     {
     }
 

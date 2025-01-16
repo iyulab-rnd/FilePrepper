@@ -5,10 +5,7 @@
 /// </summary>
 public class NormalizeDataTask : BaseTask<NormalizeDataOption>
 {
-    public NormalizeDataTask(
-        NormalizeDataOption options,
-        ILogger<NormalizeDataTask> logger)
-        : base(options, logger)
+    public NormalizeDataTask(ILogger<NormalizeDataTask> logger) : base(logger)
     {
     }
 

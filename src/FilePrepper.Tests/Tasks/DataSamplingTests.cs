@@ -34,8 +34,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42  // 재현성을 위한 시드값
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -62,8 +62,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             SystematicInterval = 3
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -90,9 +90,10 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -123,8 +124,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -150,16 +151,16 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task1 = new DataSamplingTask(options, _mockLogger.Object);
-        var task2 = new DataSamplingTask(options, _mockLogger.Object);
+        var task1 = new DataSamplingTask(_mockLogger.Object);
+        var task2 = new DataSamplingTask(_mockLogger.Object);
 
         var outputPath2 = Path.GetTempFileName();
-        var context1 = new TaskContext
+        var context1 = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
-        var context2 = new TaskContext
+        var context2 = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = outputPath2
@@ -189,8 +190,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -216,8 +217,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -317,8 +318,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = emptyInputPath,
             OutputPath = _testOutputPath
@@ -358,8 +359,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask, DataSamplingVali
             Seed = 42
         };
 
-        var task = new DataSamplingTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataSamplingTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = stratifiedInputPath,
             OutputPath = _testOutputPath

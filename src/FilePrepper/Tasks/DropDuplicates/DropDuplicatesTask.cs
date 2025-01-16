@@ -3,15 +3,8 @@
 
 public class DropDuplicatesTask : BaseTask<DropDuplicatesOption>
 {
-    public DropDuplicatesTask(
-        DropDuplicatesOption options,
-        ILogger<DropDuplicatesTask> logger)
-        : base(options, logger)
+    public DropDuplicatesTask(ILogger<DropDuplicatesTask> logger) : base(logger)
     {
-        if (options.Common == null)
-        {
-            options.Common = new();
-        }
     }
 
     protected override Task<List<Dictionary<string, string>>> ProcessRecordsAsync(

@@ -56,8 +56,8 @@ public class FilterRowsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FilterRowsTask>();
-            var task = new FilterRowsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new FilterRowsTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

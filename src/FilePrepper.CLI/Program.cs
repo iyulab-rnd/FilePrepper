@@ -87,7 +87,7 @@ public class Program
             _logger.LogInformation("Application starting...");
 
             if (args == null || args.Length == 0 || args[0] == "--help" || args[0] == "-h")
-            {
+            {   
                 ShowHelp();
                 return ExitCodes.Success;
             }
@@ -217,33 +217,41 @@ public class Program
         }
     }
 
-    private static string GetCommandExample(string command)
+    private static string[] GetCommandExamples(string command)
     {
         try
         {
-            var services = ConfigureServices(LogLevel.Error);  // 로그 레벨을 Error로 설정
+            var services = ConfigureServices(LogLevel.Error);
             var commandType = LoadCommandTypes()
                 .FirstOrDefault(t => t.GetCustomAttribute<VerbAttribute>()?.Name == command);
 
             if (commandType == null)
-                return $"  {_toolCommandName} {command} [options]";
+                return new[] { $"  {_toolCommandName} {command} [options]" };
 
             var parameters = Activator.CreateInstance(commandType) as ICommandParameters;
             if (parameters == null)
-                return $"  {_toolCommandName} {command} [options]";
+                return new[] { $"  {_toolCommandName} {command} [options]" };
 
             var handlerType = parameters.GetHandlerType();
             var handler = services.GetRequiredService(handlerType) as ICommandHandler;
             if (handler == null)
-                return $"  {_toolCommandName} {command} [options]";
+                return new[] { $"  {_toolCommandName} {command} [options]" };
 
             var example = handler.GetExample();
-            return example != null ? $"  {_toolCommandName} {example}" : $"  {_toolCommandName} {command} [options]";
+            if (example == null)
+                return new[] { $"  {_toolCommandName} {command} [options]" };
+
+            // 개별 예시로 분리하고 각각에 tool command name 추가
+            return example.Split('\n')
+                .Select(ex => ex.Trim())
+                .Where(ex => !string.IsNullOrEmpty(ex))
+                .Select(ex => $"  {_toolCommandName} {ex}")
+                .ToArray();
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Error getting command example");
-            return $"  {_toolCommandName} {command} [options]";
+            return new[] { $"  {_toolCommandName} {command} [options]" };
         }
     }
 
@@ -268,18 +276,46 @@ public class Program
 
     private static void ShowCommandHelp(string command, Type commandType)
     {
-        ConfigureLogging(LogLevel.Error); // 로그 레벨을 Error로 설정
+        ConfigureLogging(LogLevel.Error);
 
         var verbAttribute = commandType.GetCustomAttribute<VerbAttribute>();
         Console.WriteLine($"\nCommand: {command}");
         Console.WriteLine($"Description: {verbAttribute?.HelpText ?? _commandDescriptions[command]}");
-        Console.WriteLine("\nOptions:");
 
-        var properties = commandType.GetProperties()
+        // Value 속성 표시 추가
+        var valueProperties = commandType.GetProperties()
+            .Where(p => p.GetCustomAttribute<ValueAttribute>() != null)
+            .OrderBy(p => p.GetCustomAttribute<ValueAttribute>()?.Index);
+
+        if (valueProperties.Any())
+        {
+            Console.WriteLine("\nArguments:");
+            foreach (var prop in valueProperties)
+            {
+                var val = prop.GetCustomAttribute<ValueAttribute>();
+                if (val == null) continue;
+
+                var metaName = val.MetaName ?? prop.Name;
+                var required = val.Required ? " [required]" : "";
+                Console.WriteLine($"  {metaName.PadRight(20)} {val.HelpText}{required}");
+            }
+        }
+
+        Console.WriteLine("\nCommon Options:");
+        Console.WriteLine("  --ignore-errors         Whether to ignore errors during processing");
+        Console.WriteLine("      Default: false");
+        Console.WriteLine("  --default-value         Default value to use when encountering errors");
+        Console.WriteLine("  --has-header           Whether input files have headers");
+        Console.WriteLine("      Default: true");
+
+        Console.WriteLine("\nCommand-Specific Options:");
+
+
+        var optionProperties = commandType.GetProperties()
             .Where(p => p.GetCustomAttribute<OptionAttribute>() != null)
             .OrderBy(p => p.GetCustomAttribute<OptionAttribute>()?.Required == true ? 0 : 1);
 
-        foreach (var prop in properties)
+        foreach (var prop in optionProperties)
         {
             var opt = prop.GetCustomAttribute<OptionAttribute>();
             if (opt == null) continue;
@@ -296,8 +332,15 @@ public class Program
             }
         }
 
-        Console.WriteLine("\nExample:");
-        Console.WriteLine(GetCommandExample(command));
+        Console.WriteLine("\nExamples:");
+        var examples = GetCommandExamples(command);
+        foreach (var example in examples)
+        {
+            Console.WriteLine(example);
+        }
+
+        Console.WriteLine("\nWith common options:");
+        Console.WriteLine($"  ...--ignore-errors --default-value NA --has-header true");
     }
 
     private static ServiceProvider ConfigureServices()

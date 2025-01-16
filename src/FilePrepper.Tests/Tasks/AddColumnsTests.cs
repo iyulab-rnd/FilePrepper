@@ -21,8 +21,8 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
             NewColumns = new Dictionary<string, string> { { "Age", "30" } }
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AddColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -97,26 +97,86 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
     }
 
     [Fact]
-    public void Execute_WithDuplicateColumnName_ShouldReturnError()
+    public void Execute_WithDuplicateColumnName_ShouldThrowValidationException()
     {
         // Arrange
+        WriteTestFileLines(
+            "Id,Name",
+            "1,John",
+            "2,Jane"
+        );
+
         var options = new AddColumnsOption
         {
-            NewColumns = new Dictionary<string, string> { { "Name", "Test" } }  // Name already exists in input file
+            NewColumns = new Dictionary<string, string>
+        {
+            { "Name", "Duplicate" }  // Trying to add existing column
+        },
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = false
+                }
+            }
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AddColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
+        {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
+        Assert.Contains("Duplicate column names found:", exception.Message);
+        Assert.Contains("Name", exception.Message);
+    }
+
+    [Fact]
+    public void Execute_WithDuplicateColumnName_AndIgnoreErrors_ShouldSkipDuplicates()
+    {
+        // Arrange
+        WriteTestFileLines(
+            "Id,Name",
+            "1,John",
+            "2,Jane"
+        );
+
+        var options = new AddColumnsOption
+        {
+            NewColumns = new Dictionary<string, string>
+        {
+            { "Name", "Duplicate" },  // Duplicate column
+            { "Age", "30" }          // New column
+        },
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = true
+                }
+            }
+        };
+
+        var task = new AddColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
 
         // Act
-        bool result = task.Execute(context);
+        var result = task.Execute(context);
 
         // Assert
-        Assert.False(result);
+        Assert.True(result);
+        var outputLines = ReadOutputFileLines();
+        Assert.Equal(3, outputLines.Length);
+        Assert.Equal("Id,Name,Age", outputLines[0]); // Only Age should be added
+        Assert.Equal("1,John,30", outputLines[1]);
+        Assert.Equal("2,Jane,30", outputLines[2]);
     }
 
     [Fact]
@@ -133,8 +193,8 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask, AddColumnsValidator>
             }
         };
 
-        var task = new AddColumnsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AddColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

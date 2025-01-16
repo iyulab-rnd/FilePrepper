@@ -86,9 +86,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -128,9 +128,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             TargetColumns = new[] { "Score" }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -170,9 +170,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -208,9 +208,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             TargetColumns = new[] { "Score" }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -256,9 +256,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             }
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -299,9 +299,9 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask, NormalizeDataV
             MaxValue = 1
         };
 
-        var task = new NormalizeDataTask(option, _mockLogger.Object);
+        var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

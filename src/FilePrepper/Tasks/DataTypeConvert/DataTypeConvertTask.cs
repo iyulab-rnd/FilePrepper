@@ -1,14 +1,13 @@
-﻿namespace FilePrepper.Tasks.DataTypeConvert;
+﻿using FilePrepper.Tasks.DataTypeConvert;
+using FilePrepper.Tasks;
+using FilePrepper;
 
 public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
 {
     private static readonly string[] TrueValues = ["true", "yes", "1", "y", "t"];
     private static readonly string[] FalseValues = ["false", "no", "0", "n", "f"];
 
-    public DataTypeConvertTask(
-        DataTypeConvertOption options,
-        ILogger<DataTypeConvertTask> logger)
-        : base(options, logger)
+    public DataTypeConvertTask(ILogger<DataTypeConvertTask> logger) : base(logger)
     {
     }
 
@@ -27,9 +26,14 @@ public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
                             record[conversion.ColumnName],
                             conversion);
                     }
-                    catch (Exception) when (Options.Common.ErrorHandling.IgnoreErrors)
+                    catch (ValidationException) when (Options.Common.ErrorHandling.IgnoreErrors)
                     {
                         record[conversion.ColumnName] = conversion.DefaultValue ?? string.Empty;
+                    }
+                    catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
+                    {
+                        record[conversion.ColumnName] = conversion.DefaultValue ?? string.Empty;
+                        _logger.LogWarning("Error converting value: {Error}", ex.Message);
                     }
                 }
             }
@@ -57,78 +61,101 @@ public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
                 DataType.DateTime => ConvertToDateTime(processedValue, conversion, culture),
                 DataType.Boolean => ConvertToBoolean(processedValue, conversion.IgnoreCase).ToString(),
                 DataType.String => processedValue,
-                _ => throw new ArgumentException($"Unsupported target type: {conversion.TargetType}")
+                _ => throw new ValidationException($"Unsupported target type: {conversion.TargetType}",
+                    ValidationExceptionErrorCode.General)
             };
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not ValidationException)
         {
-            _logger.LogWarning(
-                "Error converting value '{Value}' to {Type}: {Error}",
-                value,
-                conversion.TargetType,
-                ex.Message);
-            throw;
+            var error = $"Error converting value '{value}' to {conversion.TargetType}: {ex.Message}";
+            _logger.LogWarning(error);
+            throw new ValidationException(error, ValidationExceptionErrorCode.General);
         }
     }
 
     private int ConvertToInteger(string value, CultureInfo culture)
     {
-        // 소수점이 있는 경우 반올림
-        if (value.Contains(".") || value.Contains(","))
+        try
         {
-            return (int)Math.Round(decimal.Parse(value, culture));
+            // 소수점이 있는 경우 반올림
+            if (value.Contains(".") || value.Contains(","))
+            {
+                return (int)Math.Round(decimal.Parse(value, culture));
+            }
+            return int.Parse(value, culture);
         }
-        return int.Parse(value, culture);
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw new ValidationException($"Invalid integer value: {value}", ValidationExceptionErrorCode.General);
+        }
     }
 
     private string ConvertToDecimal(string value, CultureInfo culture)
     {
-        var styles = NumberStyles.Number | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands;
-        var decimalValue = decimal.Parse(value, styles, culture);
-
-        // 원본 소수점 자릿수 유지
-        var originalDecimals = 1; // 최소 1자리
-        foreach (var separator in new[] {
-            culture.NumberFormat.NumberDecimalSeparator,
-            ".",
-            ","
-        })
+        try
         {
-            if (value.Contains(separator))
+            var styles = NumberStyles.Number | NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands;
+            var decimalValue = decimal.Parse(value, styles, culture);
+
+            // 원본 소수점 자릿수 유지
+            var originalDecimals = 1; // 최소 1자리
+            foreach (var separator in new[] {
+                culture.NumberFormat.NumberDecimalSeparator,
+                ".",
+                ","
+            })
             {
-                var parts = value.Split(separator);
-                if (parts.Length > 1)
+                if (value.Contains(separator))
                 {
-                    originalDecimals = Math.Max(originalDecimals, parts[1].Trim().Length);
-                    break;
+                    var parts = value.Split(separator);
+                    if (parts.Length > 1)
+                    {
+                        originalDecimals = Math.Max(originalDecimals, parts[1].Trim().Length);
+                        break;
+                    }
                 }
             }
-        }
 
-        return decimalValue.ToString($"F{originalDecimals}", CultureInfo.InvariantCulture);
+            return decimalValue.ToString($"F{originalDecimals}", CultureInfo.InvariantCulture);
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException)
+        {
+            throw new ValidationException($"Invalid decimal value: {value}", ValidationExceptionErrorCode.General);
+        }
     }
 
-    private string ConvertToDateTime(
-        string value,
-        ColumnTypeConversion conversion,
-        CultureInfo culture)
+    private string ConvertToDateTime(string value, ColumnTypeConversion conversion, CultureInfo culture)
     {
-        var dateTime = DateTime.Parse(value, culture);
-        return dateTime.ToString(conversion.DateTimeFormat, culture);
+        try
+        {
+            var dateTime = DateTime.Parse(value, culture);
+            return dateTime.ToString(conversion.DateTimeFormat, culture);
+        }
+        catch (Exception ex) when (ex is FormatException or ArgumentException)
+        {
+            throw new ValidationException($"Invalid date time value: {value}", ValidationExceptionErrorCode.General);
+        }
     }
 
     private bool ConvertToBoolean(string value, bool ignoreCase)
     {
-        if (TrueValues.Contains(value, StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase)))
+        try
         {
-            return true;
-        }
-        if (FalseValues.Contains(value, StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase)))
-        {
-            return false;
-        }
+            if (TrueValues.Contains(value, StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase)))
+            {
+                return true;
+            }
+            if (FalseValues.Contains(value, StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase)))
+            {
+                return false;
+            }
 
-        return bool.Parse(value);
+            return bool.Parse(value);
+        }
+        catch (Exception ex) when (ex is FormatException or ArgumentException)
+        {
+            throw new ValidationException($"Invalid boolean value: {value}", ValidationExceptionErrorCode.General);
+        }
     }
 
     protected override IEnumerable<string> GetRequiredColumns()

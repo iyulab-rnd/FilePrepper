@@ -65,9 +65,10 @@ public class BasicStatisticsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<BasicStatisticsTask>();
-            var task = new BasicStatisticsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new BasicStatisticsTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

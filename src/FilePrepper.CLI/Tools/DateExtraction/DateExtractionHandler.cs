@@ -71,8 +71,8 @@ public class DateExtractionHandler : ICommandHandler
             }
 
             var taskLogger = _loggerFactory.CreateLogger<DateExtractionTask>();
-            var task = new DateExtractionTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new DateExtractionTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

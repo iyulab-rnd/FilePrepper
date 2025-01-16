@@ -66,8 +66,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask, ScaleDataValidator>
             }
         };
 
-        var task = new ScaleDataTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ScaleDataTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -110,9 +110,10 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask, ScaleDataValidator>
         }
         };
 
-        var task = new ScaleDataTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ScaleDataTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -176,8 +177,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask, ScaleDataValidator>
             }
         };
 
-        var task = new ScaleDataTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ScaleDataTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

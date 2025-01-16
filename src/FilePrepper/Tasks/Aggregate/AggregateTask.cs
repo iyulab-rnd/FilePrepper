@@ -2,10 +2,7 @@
 
 public class AggregateTask : BaseTask<AggregateOption>
 {
-    public AggregateTask(
-        AggregateOption options,
-        ILogger<AggregateTask> logger)
-        : base(options, logger)
+    public AggregateTask(ILogger<AggregateTask> logger) : base(logger)
     {
     }
 

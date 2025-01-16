@@ -42,8 +42,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AggregateTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -84,8 +84,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AggregateTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -159,8 +159,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AggregateTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -212,9 +212,10 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AggregateTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = mixedDataPath,
             OutputPath = _testOutputPath
         };
@@ -263,8 +264,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask, AggregateValidator>
             }
         };
 
-        var task = new AggregateTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new AggregateTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = emptyGroupPath,
             OutputPath = _testOutputPath

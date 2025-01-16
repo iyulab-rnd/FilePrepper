@@ -2,10 +2,7 @@
 
 public class AddColumnsTask : BaseTask<AddColumnsOption>
 {
-    public AddColumnsTask(
-        AddColumnsOption options,
-        ILogger<AddColumnsTask> logger)
-        : base(options, logger)
+    public AddColumnsTask(ILogger<AddColumnsTask> logger) : base(logger)
     {
     }
 
@@ -14,20 +11,30 @@ public class AddColumnsTask : BaseTask<AddColumnsOption>
     {
         // 헤더 검증
         var headers = records.FirstOrDefault()?.Keys.ToList() ?? new List<string>();
-        foreach (var newColumn in Options.NewColumns)
+        var duplicateColumns = Options.NewColumns.Keys.Where(headers.Contains).ToList();
+        var validColumns = Options.NewColumns
+            .Where(kvp => !headers.Contains(kvp.Key))
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+        if (duplicateColumns.Any())
         {
-            if (headers.Contains(newColumn.Key))
+            var error = $"Duplicate column names found: {string.Join(", ", duplicateColumns)}";
+            _logger.LogError(error);
+
+            if (!Options.Common.ErrorHandling.IgnoreErrors)
             {
-                _logger.LogError("Duplicate column name found: {ColumnName}", newColumn.Key);
-                throw new InvalidOperationException($"Duplicate column name found: {newColumn.Key}");
+                throw new ValidationException(error, ValidationExceptionErrorCode.General);
             }
+
+            // IgnoreErrors가 true인 경우, 중복되지 않은 컬럼만 추가
+            _logger.LogWarning("Skipping duplicate columns and continuing with valid columns");
         }
 
-        // 새 컬럼 추가
+        // 새 컬럼 추가 (IgnoreErrors=true인 경우 중복되지 않은 컬럼만)
         _logger.LogInformation("Processing data and adding new columns");
         foreach (var record in records)
         {
-            foreach (var newColumn in Options.NewColumns)
+            foreach (var newColumn in validColumns)
             {
                 record[newColumn.Key] = newColumn.Value;
             }

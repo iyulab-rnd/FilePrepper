@@ -2,10 +2,7 @@
 
 public class FillMissingValuesTask : BaseTask<FillMissingValuesOption>
 {
-    public FillMissingValuesTask(
-        FillMissingValuesOption options,
-        ILogger<FillMissingValuesTask> logger)
-        : base(options, logger)
+    public FillMissingValuesTask(ILogger<FillMissingValuesTask> logger) : base(logger)
     {
     }
 

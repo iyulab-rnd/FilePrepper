@@ -2,10 +2,7 @@
 
 public class DataSamplingTask : BaseTask<DataSamplingOption>
 {
-    public DataSamplingTask(
-        DataSamplingOption options,
-        ILogger<DataSamplingTask> logger)
-        : base(options, logger)
+    public DataSamplingTask(ILogger<DataSamplingTask> logger) : base(logger)
     {
     }
 

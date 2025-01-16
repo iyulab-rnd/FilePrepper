@@ -63,9 +63,10 @@ public class FillMissingValuesHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FillMissingValuesTask>();
-            var task = new FillMissingValuesTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new FillMissingValuesTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

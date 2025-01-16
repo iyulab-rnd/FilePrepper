@@ -72,8 +72,8 @@ public class FileFormatConvertHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FileFormatConvertTask>();
-            var task = new FileFormatConvertTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new FileFormatConvertTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

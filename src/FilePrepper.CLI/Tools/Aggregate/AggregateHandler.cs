@@ -75,9 +75,10 @@ public class AggregateHandler : ICommandHandler
             }
 
             var taskLogger = _loggerFactory.CreateLogger<AggregateTask>();
-            var task = new AggregateTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new AggregateTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

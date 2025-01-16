@@ -40,9 +40,10 @@ public class DropDuplicatesHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<DropDuplicatesTask>();
-            var task = new DropDuplicatesTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new DropDuplicatesTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

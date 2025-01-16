@@ -2,10 +2,7 @@
 
 public class FilterRowsTask : BaseTask<FilterRowsOption>
 {
-    public FilterRowsTask(
-        FilterRowsOption options,
-        ILogger<FilterRowsTask> logger)
-        : base(options, logger)
+    public FilterRowsTask(ILogger<FilterRowsTask> logger) : base(logger)
     {
     }
 

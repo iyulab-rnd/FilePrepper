@@ -4,10 +4,7 @@ namespace FilePrepper.Tasks.ColumnInteraction;
 
 public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
 {
-    public ColumnInteractionTask(
-        ColumnInteractionOption options,
-        ILogger<ColumnInteractionTask> logger)
-        : base(options, logger)
+    public ColumnInteractionTask(ILogger<ColumnInteractionTask> logger) : base(logger)
     {
     }
 
@@ -18,7 +15,8 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
         var headers = records.FirstOrDefault()?.Keys.ToList() ?? new List<string>();
         if (headers.Contains(Options.OutputColumn))
         {
-            throw new InvalidOperationException($"Output column already exists: {Options.OutputColumn}");
+            throw new ValidationException($"Output column already exists: {Options.OutputColumn}",
+                ValidationExceptionErrorCode.General);
         }
 
         // 컬럼 연산 수행
@@ -29,6 +27,11 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
                 try
                 {
                     record[Options.OutputColumn] = ProcessRecord(record);
+                }
+                catch (ValidationException) when (Options.Common.ErrorHandling.IgnoreErrors)
+                {
+                    _logger.LogWarning("Error processing row");
+                    record[Options.OutputColumn] = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
                 }
                 catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
                 {
@@ -60,24 +63,32 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
         var numbers = GetNumericValues(values);
         if (numbers.Count == 0) return string.Empty;
 
-        double result = Options.Operation switch
+        try
         {
-            OperationType.Add => numbers.Sum(),
-            OperationType.Subtract => numbers.Aggregate((a, b) => a - b),
-            OperationType.Multiply => numbers.Aggregate((a, b) => a * b),
-            OperationType.Divide => numbers.Aggregate((a, b) =>
-                b != 0 ? a / b : throw new DivideByZeroException("Division by zero")),
-            _ => throw new ArgumentException($"Unsupported operation type: {Options.Operation}")
-        };
+            double result = Options.Operation switch
+            {
+                OperationType.Add => numbers.Sum(),
+                OperationType.Subtract => numbers.Aggregate((a, b) => a - b),
+                OperationType.Multiply => numbers.Aggregate((a, b) => a * b),
+                OperationType.Divide => numbers.Aggregate((a, b) =>
+                    b != 0 ? a / b : throw new ValidationException("Division by zero", ValidationExceptionErrorCode.General)),
+                _ => throw new ValidationException($"Unsupported operation type: {Options.Operation}", ValidationExceptionErrorCode.General)
+            };
 
-        return result.ToString(CultureInfo.InvariantCulture);
+            return result.ToString(CultureInfo.InvariantCulture);
+        }
+        catch (Exception ex) when (ex is not ValidationException)
+        {
+            throw new ValidationException($"Error in numeric operation: {ex.Message}", ValidationExceptionErrorCode.General);
+        }
     }
 
     private string ProcessCustomOperation(string[] values)
     {
         if (string.IsNullOrWhiteSpace(Options.CustomExpression))
         {
-            throw new ArgumentException("Custom expression is required for Custom operation type");
+            throw new ValidationException("Custom expression is required for Custom operation type",
+                ValidationExceptionErrorCode.General);
         }
 
         string expression = Options.CustomExpression;
@@ -95,7 +106,8 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
         }
         catch (Exception ex)
         {
-            throw new ArgumentException($"Error evaluating custom expression: {ex.Message}");
+            throw new ValidationException($"Error evaluating custom expression: {ex.Message}",
+                ValidationExceptionErrorCode.General);
         }
     }
 
@@ -115,10 +127,16 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
                 {
                     numbers.Add(defaultNum);
                 }
+                else
+                {
+                    throw new ValidationException($"Invalid default value: {Options.Common.ErrorHandling.DefaultValue}",
+                        ValidationExceptionErrorCode.General);
+                }
             }
             else
             {
-                throw new ArgumentException($"Invalid numeric value: {value}");
+                throw new ValidationException($"Invalid numeric value: {value}",
+                    ValidationExceptionErrorCode.General);
             }
         }
 
@@ -134,10 +152,16 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
 
         if (Options.Common.ErrorHandling.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.Common.ErrorHandling.DefaultValue))
         {
-            return Options.Common.ErrorHandling.DefaultValue;
+            if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out _))
+            {
+                return Options.Common.ErrorHandling.DefaultValue;
+            }
+            throw new ValidationException($"Invalid default value: {Options.Common.ErrorHandling.DefaultValue}",
+                ValidationExceptionErrorCode.General);
         }
 
-        throw new ArgumentException($"Invalid numeric value: {value}");
+        throw new ValidationException($"Invalid numeric value: {value}",
+            ValidationExceptionErrorCode.General);
     }
 
     protected override IEnumerable<string> GetRequiredColumns()

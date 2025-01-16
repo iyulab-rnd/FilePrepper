@@ -67,9 +67,10 @@ public class DataTypeConvertHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<DataTypeConvertTask>();
-            var task = new DataTypeConvertTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new DataTypeConvertTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

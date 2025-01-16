@@ -56,9 +56,10 @@ public class ColumnInteractionHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ColumnInteractionTask>();
-            var task = new ColumnInteractionTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new ColumnInteractionTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };
@@ -73,5 +74,5 @@ public class ColumnInteractionHandler : ICommandHandler
     }
 
     public string? GetExample() =>
-    "column-interaction -i input.csv -o output.csv -s \"Price,Quantity\" -t Multiply -o Total";
+            "column-interaction -i sales.csv -o output.csv -s \"Price,Quantity\" -t Multiply -c TotalAmount";
 }

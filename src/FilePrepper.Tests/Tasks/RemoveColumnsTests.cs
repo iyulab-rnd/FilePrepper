@@ -59,8 +59,8 @@ public class RemoveColumnsTests : TaskBaseTest<RemoveColumnsTask, RemoveColumnsV
             RemoveColumns = new List<string> { "Extra" }
         };
 
-        var task = new RemoveColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RemoveColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -98,8 +98,8 @@ public class RemoveColumnsTests : TaskBaseTest<RemoveColumnsTask, RemoveColumnsV
             RemoveColumns = new List<string> { "Extra", "Extra2" }
         };
 
-        var task = new RemoveColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RemoveColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -131,8 +131,8 @@ public class RemoveColumnsTests : TaskBaseTest<RemoveColumnsTask, RemoveColumnsV
             RemoveColumns = new List<string> { "Extra" }
         };
 
-        var task = new RemoveColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RemoveColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -166,8 +166,8 @@ public class RemoveColumnsTests : TaskBaseTest<RemoveColumnsTask, RemoveColumnsV
             RemoveColumns = new List<string> { "Extra" }
         };
 
-        var task = new RemoveColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RemoveColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

@@ -43,8 +43,8 @@ public class AddColumnsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<AddColumnsTask>();
-            var task = new AddColumnsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new AddColumnsTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

@@ -31,9 +31,10 @@ public class ReorderColumnsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ReorderColumnsTask>();
-            var task = new ReorderColumnsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new ReorderColumnsTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

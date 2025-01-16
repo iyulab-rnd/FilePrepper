@@ -2,10 +2,7 @@
 
 public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
 {
-    public BasicStatisticsTask(
-        BasicStatisticsOption options,
-        ILogger<BasicStatisticsTask> logger)
-        : base(options, logger)
+    public BasicStatisticsTask(ILogger<BasicStatisticsTask> logger) : base(logger)
     {
     }
 

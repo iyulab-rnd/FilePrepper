@@ -35,8 +35,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
         }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -71,8 +71,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
         }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -120,8 +120,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
             };
 
-            var task = new DataTypeConvertTask(options, _mockLogger.Object);
-            var context = new TaskContext
+            var task = new DataTypeConvertTask(_mockLogger.Object);
+            var context = new TaskContext(options)
             {
                 InputPath = cultureDataPath,
                 OutputPath = _testOutputPath
@@ -157,8 +157,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -196,8 +196,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -249,8 +249,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
@@ -283,13 +283,13 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
         var options = new DataTypeConvertOption
         {
             Conversions = new List<ColumnTypeConversion>
+        {
+            new()
             {
-                new()
-                {
-                    ColumnName = "Value",
-                    TargetType = DataType.Integer
-                }
-            },
+                ColumnName = "Value",
+                TargetType = DataType.Integer
+            }
+        },
             Common = new CommonTaskOptions
             {
                 ErrorHandling = new ErrorHandlingOptions
@@ -299,18 +299,16 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
         };
 
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
+        // Act & Assert
+        var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
+        Assert.Contains("Invalid integer value: invalid", exception.Message);
 
         // Cleanup
         File.Delete(invalidDataPath);
@@ -337,8 +335,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -375,9 +373,10 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask, DataTypeCo
             }
         };
 
-        var task = new DataTypeConvertTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DataTypeConvertTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = emptyInputPath,
             OutputPath = _testOutputPath
         };

@@ -12,10 +12,7 @@ public class FileFormatConvertTask : BaseTask<FileFormatConvertOption>
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public FileFormatConvertTask(
-        FileFormatConvertOption options,
-        ILogger<FileFormatConvertTask> logger)
-        : base(options, logger)
+    public FileFormatConvertTask(ILogger<FileFormatConvertTask> logger) : base(logger)
     {
     }
 

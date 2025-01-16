@@ -48,8 +48,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -104,8 +104,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = customFormatPath,
             OutputPath = _testOutputPath
@@ -159,8 +159,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = culturePath,
             OutputPath = _testOutputPath
@@ -206,8 +206,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -259,9 +259,10 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -316,8 +317,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
@@ -360,14 +361,14 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
         var options = new DateExtractionOption
         {
             Extractions = new List<DateColumnExtraction>
+        {
+            new()
             {
-                new()
-                {
-                    SourceColumn = "DateValue",
-                    Components = new List<DateComponent> { DateComponent.Year },
-                    OutputColumnTemplate = "{column}_{component}"
-                }
-            },
+                SourceColumn = "DateValue",
+                Components = new List<DateComponent> { DateComponent.Year },
+                OutputColumnTemplate = "{column}_{component}"
+            }
+        },
             Common = new CommonTaskOptions
             {
                 Output = new OutputOptions
@@ -381,18 +382,16 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
         };
 
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
+        // Act & Assert
+        var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
+        Assert.Contains("Failed to parse date value 'invalid-date'", exception.Message);
 
         // Cleanup
         File.Delete(invalidDataPath);
@@ -425,8 +424,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = emptyInputPath,
             OutputPath = _testOutputPath
@@ -468,8 +467,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -519,8 +518,8 @@ public class DateExtractionTests : TaskBaseTest<DateExtractionTask, DateExtracti
             }
         };
 
-        var task = new DateExtractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new DateExtractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

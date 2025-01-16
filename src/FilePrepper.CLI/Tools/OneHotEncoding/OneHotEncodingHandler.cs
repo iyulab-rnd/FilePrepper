@@ -39,8 +39,8 @@ public class OneHotEncodingHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<OneHotEncodingTask>();
-            var task = new OneHotEncodingTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new OneHotEncodingTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

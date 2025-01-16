@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using FilePrepper.Tasks.Merge;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tasks;
@@ -6,35 +7,54 @@ namespace FilePrepper.Tasks;
 public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
 {
     protected readonly ILogger _logger;
-    protected List<string> _originalHeaders = new();
+    protected List<string> _originalHeaders = [];
+    private TaskContext _context;
 
-    public string Name => GetType().Name.Replace("Task", string.Empty);
-    public TOption Options { get; }
-    ITaskOption ITask.Options => Options;
-
-    protected BaseTask(TOption options, ILogger logger)
+    // Options 프로퍼티를 안전하게 수정
+    protected TOption Options
     {
-        Options = options ?? throw new ArgumentNullException(nameof(options));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        get
+        {
+            if (_context == null)
+            {
+                throw new InvalidOperationException("Task context has not been initialized");
+            }
+            return _context.GetOptions<TOption>();
+        }
     }
 
-    public bool Execute(TaskContext context)
+    ITaskOption ITask.Options => Options;
+
+    public string Name => GetType().Name.Replace("Task", string.Empty);
+
+    protected BaseTask(ILogger logger)
     {
-        return ExecuteAsync(context).GetAwaiter().GetResult();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task<bool> ExecuteAsync(TaskContext context)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
+        _context = context;
 
         try
         {
-            // 필수 컬럼 검증
+            var validationErrors = context.Options.Validate();
+            if (validationErrors.Length != 0)
+            {
+                var error = $"Validation errors in {Name} task: {string.Join(", ", validationErrors)}";
+                _logger.LogError(error);
+                if (!Options.Common.ErrorHandling.IgnoreErrors)
+                {
+                    throw new ValidationException(error, ValidationExceptionErrorCode.General);
+                }
+                return false;
+            }
+
             var requiredColumns = GetRequiredColumns().ToList();
-            if (requiredColumns.Count != 0)
+
+            // MergeTask는 필수 컬럼 검증을 건너뜁니다
+            if (requiredColumns.Count != 0 && this is not MergeTask)
             {
                 using var reader = new StreamReader(context.InputPath);
                 using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration());
@@ -69,7 +89,7 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
                 return true;
             }
             _logger.LogError(ex, "Validation error in {TaskName} task: {Message}", Name, ex.Message);
-            throw; // ValidationException은 다시 throw
+            throw;
         }
         catch (Exception ex)
         {
@@ -79,8 +99,13 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
                 return true;
             }
             _logger.LogError(ex, "Error executing {TaskName} task: {Message}", Name, ex.Message);
-            return false;
+            throw;
         }
+    }
+
+    public bool Execute(TaskContext context)
+    {
+        return ExecuteAsync(context).GetAwaiter().GetResult();
     }
 
     private async Task<List<Dictionary<string, string>>> ReadAndPreProcessAsync(TaskContext context)
@@ -114,45 +139,59 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         _logger.LogInformation("Reading input file: {Path}", path);
 
         using var reader = new StreamReader(path);
-        using var csv = new CsvReader(reader, CsvUtils.GetDefaultConfiguration(Options.HasHeader));
+        using var parser = new CsvParser(reader, CsvUtils.GetDefaultConfiguration(Options.HasHeader));
 
         var records = new List<Dictionary<string, string>>();
         var headers = new List<string>();
 
-        if (Options.HasHeader)
+        // Read first row
+        if (await parser.ReadAsync())
         {
-            await csv.ReadAsync();
-            csv.ReadHeader();
-            headers.AddRange(csv.HeaderRecord);
-        }
-        else
-        {
-            // 헤더 없는 경우 첫 줄을 읽어서 컬럼 수 파악
-            if (await csv.ReadAsync())
+            var firstRow = parser.Record;
+            var fieldCount = firstRow.Length;
+
+            if (Options.HasHeader)
             {
-                var fieldCount = csv.Parser.RawRecord.Count(c => c == ',') + 1;
-                headers.AddRange(Enumerable.Range(0, fieldCount).Select(i => i.ToString()));
+                // Use actual headers from the file
+                headers.AddRange(firstRow);
             }
+            else
+            {
+                // Use numeric indices as headers
+                headers.AddRange(Enumerable.Range(0, fieldCount).Select(i => i.ToString()));
+
+                // Add first row as data when HasHeader is false
+                var record = new Dictionary<string, string>();
+                for (int i = 0; i < fieldCount; i++)
+                {
+                    record[headers[i]] = firstRow[i];
+                }
+                records.Add(record);
+            }
+
+            _logger.LogDebug("Using headers: {Headers}", string.Join(", ", headers));
         }
 
-        // 레코드 읽기
-        while (await csv.ReadAsync())
+        // Read remaining records
+        while (await parser.ReadAsync())
         {
             var record = new Dictionary<string, string>();
-            for (int i = 0; i < headers.Count; i++)
+            for (int i = 0; i < parser.Record.Length && i < headers.Count; i++)
             {
-                record[headers[i]] = csv.GetField(i) ?? string.Empty;
+                record[headers[i]] = parser.Record[i];
             }
             records.Add(record);
+            _logger.LogDebug("Added row: {Row}", string.Join(", ", record.Values));
         }
 
+        _logger.LogInformation("Finished reading file {Path}. Read {Count} records", path, records.Count);
         return (records, headers);
     }
 
     protected virtual async Task WriteOutputAsync(
-        string outputPath,
-        IEnumerable<string> headers,
-        IEnumerable<Dictionary<string, string>> records)
+    string outputPath,
+    IEnumerable<string> headers,
+    IEnumerable<Dictionary<string, string>> records)
     {
         var finalHeaders = headers.Any() ? headers : _originalHeaders;
         if (!finalHeaders.Any())
@@ -161,14 +200,19 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
         }
 
         await using var writer = new StreamWriter(outputPath);
-        await using var csv = new CsvWriter(writer, CsvUtils.GetDefaultConfiguration());
+        await using var csv = new CsvWriter(writer, CsvUtils.GetDefaultConfiguration(Options.HasHeader));
 
-        foreach (var header in finalHeaders)
+        // HasHeader가 true일 때만 헤더 작성
+        if (Options.HasHeader)
         {
-            csv.WriteField(header);
+            foreach (var header in finalHeaders)
+            {
+                csv.WriteField(header);
+            }
+            csv.NextRecord();
         }
-        csv.NextRecord();
 
+        // 데이터 작성
         foreach (var record in records)
         {
             foreach (var header in finalHeaders)

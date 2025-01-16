@@ -48,9 +48,10 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
         };
@@ -96,9 +97,9 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
-        {
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
+        {   
             InputPath = outlierDataPath,
             OutputPath = _testOutputPath
         };
@@ -148,9 +149,10 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -184,9 +186,10 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             Statistics = new[] { StatisticType.ZScore }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -221,9 +224,10 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             Statistics = new[] { StatisticType.PercentRank }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -259,8 +263,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -305,8 +309,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask, BasicStati
             }
         };
 
-        var task = new BasicStatisticsTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new BasicStatisticsTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

@@ -5,10 +5,7 @@
 /// </summary>
 public class OneHotEncodingTask : BaseTask<OneHotEncodingOption>
 {
-    public OneHotEncodingTask(
-        OneHotEncodingOption options,
-        ILogger<OneHotEncodingTask> logger)
-        : base(options, logger)
+    public OneHotEncodingTask(ILogger<OneHotEncodingTask> logger) : base(logger)
     {
     }
 

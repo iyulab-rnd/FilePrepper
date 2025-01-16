@@ -56,9 +56,10 @@ public class NormalizeDataHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<NormalizeDataTask>();
-            var task = new NormalizeDataTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new NormalizeDataTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

@@ -36,9 +36,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = outputColumn
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -65,6 +66,75 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
     }
 
     [Fact]
+    public void Execute_WithDuplicateOutputColumn_ShouldFail()
+    {
+        // Arrange
+        var options = new ColumnInteractionOption
+        {
+            SourceColumns = new[] { "Value1", "Value2" },
+            Operation = OperationType.Add,
+            OutputColumn = "Value1",  // 이미 존재하는 컬럼명
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = false
+                }
+            }
+        };
+
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
+        {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
+        Assert.Equal("Output column already exists: Value1", exception.Message);
+    }
+
+    [Fact]
+    public void Execute_WithInvalidData_AndNoIgnoreErrors_ShouldFail()
+    {
+        // 잘못된 데이터가 포함된 파일 생성
+        var invalidDataPath = Path.GetTempFileName();
+        File.WriteAllText(invalidDataPath,
+            "Value1,Value2\n" +
+            "10,20\n" +
+            "invalid,25\n");
+
+        var options = new ColumnInteractionOption
+        {
+            SourceColumns = new[] { "Value1", "Value2" },
+            Operation = OperationType.Add,
+            OutputColumn = "Sum",
+            Common = new CommonTaskOptions
+            {
+                ErrorHandling = new ErrorHandlingOptions
+                {
+                    IgnoreErrors = false
+                }
+            }
+        };
+
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
+        {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath
+        };
+
+        // Act & Assert
+        var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
+        Assert.Contains("Invalid numeric value", exception.Message);
+
+        // Cleanup
+        File.Delete(invalidDataPath);
+    }
+
+    [Fact]
     public void Execute_WithConcat_ShouldSucceed()
     {
         // Arrange
@@ -75,9 +145,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = "CombinedText"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -105,9 +176,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             CustomExpression = "$1 + $2 * $3"  // ($1 = Value1, $2 = Value2, $3 = Value3)
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -153,9 +225,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             },
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = invalidDataPath,
             OutputPath = _testOutputPath
         };
@@ -167,47 +240,6 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
         Assert.True(result);
         string[] lines = File.ReadAllLines(_testOutputPath);
         Assert.Equal(4, lines.Length); // 헤더 + 3개 데이터 행
-
-        // Cleanup
-        File.Delete(invalidDataPath);
-    }
-
-    [Fact]
-    public void Execute_WithInvalidData_AndNoIgnoreErrors_ShouldFail()
-    {
-        // 잘못된 데이터가 포함된 파일 생성
-        var invalidDataPath = Path.GetTempFileName();
-        File.WriteAllText(invalidDataPath,
-            "Value1,Value2\n" +
-            "10,20\n" +
-            "invalid,25\n");
-
-        var options = new ColumnInteractionOption
-        {
-            SourceColumns = new[] { "Value1", "Value2" },
-            Operation = OperationType.Add,
-            OutputColumn = "Sum",
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions()
-                {
-                    IgnoreErrors = false,
-                }
-            }
-        };
-
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
-        {
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
-
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
 
         // Cleanup
         File.Delete(invalidDataPath);
@@ -239,9 +271,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             }
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = divisionByZeroPath,
             OutputPath = _testOutputPath
         };
@@ -352,9 +385,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             OutputColumn = "Total"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };
@@ -372,31 +406,6 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
     }
 
     [Fact]
-    public void Execute_WithDuplicateOutputColumn_ShouldFail()
-    {
-        // Arrange
-        var options = new ColumnInteractionOption
-        {
-            SourceColumns = new[] { "Value1", "Value2" },
-            Operation = OperationType.Add,
-            OutputColumn = "Value1"  // 이미 존재하는 컬럼명
-        };
-
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
-        // Act
-        bool result = task.Execute(context);
-
-        // Assert
-        Assert.False(result);
-    }
-
-    [Fact]
     public void Execute_WithComplexCustomExpression_ShouldSucceed()
     {
         // Arrange
@@ -408,9 +417,10 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask, Column
             CustomExpression = "($1 + $2) * $3 / 2"
         };
 
-        var task = new ColumnInteractionTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ColumnInteractionTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
+            
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
         };

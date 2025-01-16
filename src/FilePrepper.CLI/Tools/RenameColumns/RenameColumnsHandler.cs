@@ -50,8 +50,8 @@ public class RenameColumnsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<RenameColumnsTask>();
-            var task = new RenameColumnsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new RenameColumnsTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

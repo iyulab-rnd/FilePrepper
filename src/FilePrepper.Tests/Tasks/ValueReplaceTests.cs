@@ -105,8 +105,8 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask, ValueReplaceVali
             }
         };
 
-        var task = new ValueReplaceTask(options, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new ValueReplaceTask(_mockLogger.Object);
+        var context = new TaskContext(options)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

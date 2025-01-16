@@ -17,6 +17,10 @@ public abstract class BaseParameters : ICommandParameters
         HelpText = "Default value to use when encountering errors")]
     public string? DefaultValue { get; set; }
 
+    [Option("has-header", Default = true,
+        HelpText = "Whether input files have headers")]
+    public bool HasHeader { get; set; } = true;
+
     public abstract Type GetHandlerType();
 
     public virtual CommonTaskOptions GetCommonOptions() => new()

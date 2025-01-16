@@ -47,8 +47,8 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask, OneHotEncodi
             KeepOriginalColumns = false
         };
 
-        var task = new OneHotEncodingTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new OneHotEncodingTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -92,8 +92,8 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask, OneHotEncodi
             KeepOriginalColumns = true
         };
 
-        var task = new OneHotEncodingTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new OneHotEncodingTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -134,8 +134,8 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask, OneHotEncodi
             KeepOriginalColumns = false
         };
 
-        var task = new OneHotEncodingTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new OneHotEncodingTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -179,8 +179,8 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask, OneHotEncodi
             KeepOriginalColumns = false
         };
 
-        var task = new OneHotEncodingTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new OneHotEncodingTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

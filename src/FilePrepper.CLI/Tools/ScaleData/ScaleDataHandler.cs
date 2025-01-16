@@ -62,9 +62,10 @@ public class ScaleDataHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ScaleDataTask>();
-            var task = new ScaleDataTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new ScaleDataTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

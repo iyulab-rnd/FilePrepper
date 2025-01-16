@@ -71,8 +71,8 @@ public class ValueReplaceHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ValueReplaceTask>();
-            var task = new ValueReplaceTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new ValueReplaceTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

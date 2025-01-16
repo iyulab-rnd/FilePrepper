@@ -60,8 +60,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RenameColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -96,8 +96,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RenameColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath
@@ -134,8 +134,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask, RenameColumnsV
             }
         };
 
-        var task = new RenameColumnsTask(option, _mockLogger.Object);
-        var context = new TaskContext
+        var task = new RenameColumnsTask(_mockLogger.Object);
+        var context = new TaskContext(option)
         {
             InputPath = _testInputPath,
             OutputPath = _testOutputPath

@@ -2,10 +2,7 @@
 
 public class ValueReplaceTask : BaseTask<ValueReplaceOption>
 {
-    public ValueReplaceTask(
-        ValueReplaceOption options,
-        ILogger<ValueReplaceTask> logger)
-        : base(options, logger)
+    public ValueReplaceTask(ILogger<ValueReplaceTask> logger) : base(logger)
     {
     }
 

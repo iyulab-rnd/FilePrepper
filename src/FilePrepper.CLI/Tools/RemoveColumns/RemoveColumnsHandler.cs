@@ -45,8 +45,8 @@ public class RemoveColumnsHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<RemoveColumnsTask>();
-            var task = new RemoveColumnsTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new RemoveColumnsTask(taskLogger);
+            var context = new TaskContext(options)
             {
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath

@@ -2,10 +2,7 @@
 
 public class DateExtractionTask : BaseTask<DateExtractionOption>
 {
-    public DateExtractionTask(
-        DateExtractionOption options,
-        ILogger<DateExtractionTask> logger)
-        : base(options, logger)
+    public DateExtractionTask(ILogger<DateExtractionTask> logger) : base(logger)
     {
     }
 
@@ -24,9 +21,9 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
                 {
                     ProcessDateExtraction(newRecord, extraction);
                 }
-                catch (FormatException ex)
+                catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to parse date value '{Value}' for column {Column}",
+                    _logger.LogWarning("Failed to parse date value '{Value}' for column {Column}",
                         record[extraction.SourceColumn], extraction.SourceColumn);
 
                     // 실패한 컴포넌트들에 대해 빈 값 설정
@@ -38,7 +35,9 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
 
                     if (!Options.Common.ErrorHandling.IgnoreErrors)
                     {
-                        throw;
+                        throw new ValidationException(
+                            $"Failed to parse date value '{record[extraction.SourceColumn]}' for column {extraction.SourceColumn}: {ex.Message}",
+                            ValidationExceptionErrorCode.General);
                     }
                 }
             }
@@ -63,9 +62,19 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
         }
 
         var culture = extraction.Culture ?? CultureInfo.InvariantCulture;
-        var dateTime = extraction.DateFormat != null
-            ? DateTime.ParseExact(value, extraction.DateFormat, culture)
-            : DateTime.Parse(value, culture);
+        DateTime dateTime;
+        try
+        {
+            dateTime = extraction.DateFormat != null
+                ? DateTime.ParseExact(value, extraction.DateFormat, culture)
+                : DateTime.Parse(value, culture);
+        }
+        catch (Exception ex)
+        {
+            throw new ValidationException(
+                $"Failed to parse date value '{value}': {ex.Message}",
+                ValidationExceptionErrorCode.General);
+        }
 
         foreach (var component in extraction.Components)
         {
@@ -88,7 +97,8 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
             DateComponent.WeekOfYear => ISOWeek.GetWeekOfYear(date).ToString(),
             DateComponent.Quarter => ((date.Month - 1) / 3 + 1).ToString(),
             DateComponent.DayOfYear => date.DayOfYear.ToString(),
-            _ => throw new ArgumentException($"Unsupported date component: {component}")
+            _ => throw new ValidationException($"Unsupported date component: {component}",
+                ValidationExceptionErrorCode.General)
         };
 
     private string GetOutputColumnName(DateColumnExtraction extraction, DateComponent component)

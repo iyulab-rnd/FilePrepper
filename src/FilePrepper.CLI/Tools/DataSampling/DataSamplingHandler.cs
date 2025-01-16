@@ -57,9 +57,10 @@ public class DataSamplingHandler : ICommandHandler
             };
 
             var taskLogger = _loggerFactory.CreateLogger<DataSamplingTask>();
-            var task = new DataSamplingTask(options, taskLogger);
-            var context = new TaskContext
+            var task = new DataSamplingTask(taskLogger);
+            var context = new TaskContext(options)
             {
+
                 InputPath = opts.InputPath,
                 OutputPath = opts.OutputPath
             };

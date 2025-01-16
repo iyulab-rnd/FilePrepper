@@ -2,10 +2,7 @@
 
 public class RemoveColumnsTask : BaseTask<RemoveColumnsOption>
 {
-    public RemoveColumnsTask(
-        RemoveColumnsOption options,
-        ILogger<RemoveColumnsTask> logger)
-        : base(options, logger)
+    public RemoveColumnsTask(ILogger<RemoveColumnsTask> logger) : base(logger)
     {
     }
 
