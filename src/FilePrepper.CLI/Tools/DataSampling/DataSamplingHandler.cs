@@ -1,79 +1,56 @@
-﻿using FilePrepper.CLI.Tools;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
 using FilePrepper.Tasks.DataSampling;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.DataSampling;
 
-public class DataSamplingHandler : ICommandHandler
+public class DataSamplingHandler : BaseCommandHandler<DataSamplingParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<DataSamplingHandler> _logger;
-
     public DataSamplingHandler(
         ILoggerFactory loggerFactory,
         ILogger<DataSamplingHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (DataSamplingParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            // Validate sampling method
-            if (!Enum.TryParse<SamplingMethod>(opts.Method, true, out var samplingMethod))
-            {
-                _logger.LogError("Invalid sampling method: {Method}. Valid values are: {ValidValues}",
-                    opts.Method, string.Join(", ", Enum.GetNames<SamplingMethod>()));
-                return 1;
-            }
+            return ExitCodes.InvalidArguments;
+        }
 
-            // Validate stratify column when needed
-            if (samplingMethod == SamplingMethod.Stratified && string.IsNullOrWhiteSpace(opts.StratifyColumn))
+        return await HandleExceptionAsync(async () =>
+        {
+            if (!Enum.TryParse<SamplingMethod>(opts.Method, true, out var method))
             {
-                _logger.LogError("Stratify column is required when using Stratified sampling method");
-                return 1;
-            }
-
-            // Validate systematic interval when needed
-            if (samplingMethod == SamplingMethod.Systematic && (!opts.SystematicInterval.HasValue || opts.SystematicInterval.Value <= 0))
-            {
-                _logger.LogError("Valid systematic interval is required when using Systematic sampling method");
-                return 1;
+                _logger.LogError("Invalid sampling method: {Method}", opts.Method);
+                return ExitCodes.InvalidArguments;
             }
 
             var options = new DataSamplingOption
             {
-                Method = samplingMethod,
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
+                Method = method,
                 SampleSize = opts.SampleSize,
                 Seed = opts.Seed,
                 StratifyColumn = opts.StratifyColumn,
                 SystematicInterval = opts.SystematicInterval,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<DataSamplingTask>();
             var task = new DataSamplingTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
-
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing data-sampling command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "data-sampling -i input.csv -o output.csv -m Stratified --stratify Category -s 0.3 --seed 42";
+    public override string? GetExample() =>
+        "data-sampling -i input.csv -o output.csv -m Random -s 0.3 --seed 42";
 }

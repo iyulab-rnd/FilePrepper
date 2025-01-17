@@ -1,78 +1,64 @@
-﻿using FilePrepper.CLI.Tools;
+﻿using CommandLine;
 using FilePrepper.Tasks;
 using FilePrepper.Tasks.ColumnInteraction;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.ColumnInteraction;
 
-public class ColumnInteractionHandler : ICommandHandler
+/// <summary>
+/// CLI의 column-interaction 명령어 핸들러
+/// </summary>
+public class ColumnInteractionHandler : BaseCommandHandler<ColumnInteractionParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<ColumnInteractionHandler> _logger;
-
     public ColumnInteractionHandler(
         ILoggerFactory loggerFactory,
         ILogger<ColumnInteractionHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (ColumnInteractionParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            // Validate operation type
+            return ExitCodes.InvalidArguments;
+        }
+
+        return await HandleExceptionAsync(async () =>
+        {
             if (!Enum.TryParse<OperationType>(opts.Operation, true, out var operationType))
             {
                 _logger.LogError("Invalid operation type: {Operation}. Valid values are: {ValidValues}",
                     opts.Operation, string.Join(", ", Enum.GetNames<OperationType>()));
-                return 1;
-            }
-
-            // Validate custom expression when needed
-            if (operationType == OperationType.Custom && string.IsNullOrWhiteSpace(opts.CustomExpression))
-            {
-                _logger.LogError("Custom expression is required when using Custom operation type");
-                return 1;
-            }
-
-            // Validate source columns count
-            if (opts.SourceColumns.Count() < 2)
-            {
-                _logger.LogError("At least two source columns must be specified");
-                return 1;
+                return ExitCodes.InvalidArguments;
             }
 
             var options = new ColumnInteractionOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 SourceColumns = opts.SourceColumns.ToArray(),
                 Operation = operationType,
                 OutputColumn = opts.OutputColumn,
                 CustomExpression = opts.CustomExpression,
-                Common = opts.GetCommonOptions()
+                DefaultValue = opts.DefaultValue,
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ColumnInteractionTask>();
             var task = new ColumnInteractionTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            _logger.LogInformation("Performing {Operation} operation on columns {Columns} to create {Output}",
+                operationType, string.Join(", ", opts.SourceColumns), opts.OutputColumn);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing column-interaction command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-            "column-interaction -i sales.csv -o output.csv -s \"Price,Quantity\" -t Multiply -c TotalAmount";
+    public override string? GetExample() =>
+        "column-interaction -i sales.csv -o output.csv -s \"Price,Quantity\" -t Multiply -c TotalAmount";
 }

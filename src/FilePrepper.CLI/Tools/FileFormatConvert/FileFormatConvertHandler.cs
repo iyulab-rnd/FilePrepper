@@ -1,93 +1,62 @@
-﻿using FilePrepper.Tasks.FileFormatConvert;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
+using FilePrepper.Tasks.FileFormatConvert;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.FileFormatConvert;
 
-public class FileFormatConvertHandler : ICommandHandler
+public class FileFormatConvertHandler : BaseCommandHandler<FileFormatConvertParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<FileFormatConvertHandler> _logger;
-
     public FileFormatConvertHandler(
         ILoggerFactory loggerFactory,
         ILogger<FileFormatConvertHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (FileFormatConvertParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            // Validate and parse format
+            return ExitCodes.InvalidArguments;
+        }
+
+        return await HandleExceptionAsync(async () =>
+        {
             if (!Enum.TryParse<FileFormat>(opts.TargetFormat, true, out var format))
             {
-                _logger.LogError("Invalid target format: {Format}. Valid values are: {ValidValues}",
-                    opts.TargetFormat, string.Join(", ", Enum.GetNames<FileFormat>()));
-                return 1;
+                _logger.LogError("Invalid target format: {Format}", opts.TargetFormat);
+                return ExitCodes.InvalidArguments;
             }
 
-            // Validate and get encoding
-            Encoding encoding;
-            try
-            {
-                encoding = Encoding.GetEncoding(opts.Encoding);
-            }
-            catch (ArgumentException)
-            {
-                _logger.LogError("Invalid encoding: {Encoding}", opts.Encoding);
-                return 1;
-            }
-
-            // XML format specific validations
-            if (format == FileFormat.XML)
-            {
-                if (string.IsNullOrWhiteSpace(opts.RootElementName))
-                {
-                    _logger.LogError("Root element name cannot be empty for XML format");
-                    return 1;
-                }
-                if (string.IsNullOrWhiteSpace(opts.ItemElementName))
-                {
-                    _logger.LogError("Item element name cannot be empty for XML format");
-                    return 1;
-                }
-            }
+            var encoding = Encoding.GetEncoding(opts.Encoding);
 
             var options = new FileFormatConvertOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 TargetFormat = format,
                 Encoding = encoding,
-                HasHeader = true, // CSV 파일은 항상 헤더가 있다고 가정
+                HasHeader = opts.HasHeader,
                 PrettyPrint = opts.PrettyPrint,
                 RootElementName = opts.RootElementName,
                 ItemElementName = opts.ItemElementName,
-                Common = opts.GetCommonOptions()
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FileFormatConvertTask>();
             var task = new FileFormatConvertTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing convert-format command");
-            return 1;
-        }
+            _logger.LogInformation("Converting {Input} to {Format} format",
+                opts.InputPath, format);
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "convert-format -i input.csv -o output.json -t JSON --pretty";
+    public override string? GetExample() =>
+        "convert-format -i input.csv -o output.json -t JSON --pretty";
 }

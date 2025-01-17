@@ -1,51 +1,37 @@
-﻿using FilePrepper.Tasks.FillMissingValues;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
+using FilePrepper.Tasks.FillMissingValues;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.FillMissingValues;
 
-public class FillMissingValuesHandler : ICommandHandler
+public class FillMissingValuesHandler : BaseCommandHandler<FillMissingValuesParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<FillMissingValuesHandler> _logger;
-
     public FillMissingValuesHandler(
         ILoggerFactory loggerFactory,
         ILogger<FillMissingValuesHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (FillMissingValuesParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var fillMethods = new List<ColumnFillMethod>();
+
             foreach (var methodStr in opts.FillMethods)
             {
                 var parts = methodStr.Split(':');
-                if (parts.Length < 2 || parts.Length > 3)
-                {
-                    _logger.LogError("Invalid fill method format: {Method}. Expected format: column:method[:value]", methodStr);
-                    return 1;
-                }
-
                 if (!Enum.TryParse<FillMethod>(parts[1], true, out var method))
                 {
-                    _logger.LogError("Invalid fill method: {Method}. Valid values are: {ValidValues}",
-                        parts[1], string.Join(", ", Enum.GetNames<FillMethod>()));
-                    return 1;
-                }
-
-                // FixedValue 메서드는 값이 반드시 필요
-                if (method == FillMethod.FixedValue && parts.Length != 3)
-                {
-                    _logger.LogError("Fixed value must be specified for FixedValue method: {Method}", methodStr);
-                    return 1;
+                    _logger.LogError("Invalid fill method: {Method}", parts[1]);
+                    return ExitCodes.InvalidArguments;
                 }
 
                 fillMethods.Add(new ColumnFillMethod
@@ -58,28 +44,28 @@ public class FillMissingValuesHandler : ICommandHandler
 
             var options = new FillMissingValuesOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 FillMethods = fillMethods,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors,
+                DefaultValue = opts.DefaultValue,
+                AppendToSource = opts.AppendToSource,
+                OutputColumnTemplate = opts.OutputColumnTemplate
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FillMissingValuesTask>();
             var task = new FillMissingValuesTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            _logger.LogInformation("Filling missing values in {Input} using {Count} methods",
+                opts.InputPath, fillMethods.Count);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing fill-missing command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "fill-missing -i input.csv -o output.csv -m \"Age:Mean,Name:FixedValue:Unknown,Score:Median\"";
+    public override string? GetExample() =>
+        "fill-missing -i input.csv -o output.csv -m \"Age:Mean,Name:FixedValue:Unknown,Score:Median\"";
 }

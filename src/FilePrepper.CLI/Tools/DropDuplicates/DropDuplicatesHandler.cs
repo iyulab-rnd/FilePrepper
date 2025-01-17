@@ -1,62 +1,51 @@
-﻿using FilePrepper.Tasks.DropDuplicates;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
+using FilePrepper.Tasks.DropDuplicates;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.DropDuplicates;
 
-public class DropDuplicatesHandler : ICommandHandler
+public class DropDuplicatesHandler : BaseCommandHandler<DropDuplicatesParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<DropDuplicatesHandler> _logger;
-
     public DropDuplicatesHandler(
         ILoggerFactory loggerFactory,
         ILogger<DropDuplicatesHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (DropDuplicatesParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            // Validate when using subset columns
-            if (opts.SubsetColumnsOnly && !opts.TargetColumns.Any())
-            {
-                _logger.LogError("Target columns must be specified when using subset-only");
-                return 1;
-            }
+            return ExitCodes.InvalidArguments;
+        }
 
+        return await HandleExceptionAsync(async () =>
+        {
             var options = new DropDuplicatesOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 KeepFirst = opts.KeepFirst,
                 SubsetColumnsOnly = opts.SubsetColumnsOnly,
                 TargetColumns = opts.TargetColumns.ToArray(),
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<DropDuplicatesTask>();
             var task = new DropDuplicatesTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            _logger.LogInformation("Removing duplicates from {Input}. Keep first: {KeepFirst}, Subset only: {SubsetOnly}",
+                opts.InputPath, opts.KeepFirst, opts.SubsetColumnsOnly);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing drop-duplicates command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "drop-duplicates -i input.csv -o output.csv --subset-only -c \"Name,Department\" --keep-first";
+    public override string? GetExample() =>
+        "drop-duplicates -i input.csv -o output.csv --subset-only -c \"Name,Department\" --keep-first";
 }

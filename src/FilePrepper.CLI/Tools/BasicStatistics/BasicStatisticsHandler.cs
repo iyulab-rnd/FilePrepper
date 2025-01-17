@@ -1,90 +1,88 @@
-﻿using FilePrepper.Tasks.BasicStatistics;
+﻿using CommandLine;
 using FilePrepper.Tasks;
+using FilePrepper.Tasks.BasicStatistics;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.BasicStatistics;
 
-public class BasicStatisticsHandler : ICommandHandler
+/// <summary>
+/// CLI의 stats 명령어 핸들러
+/// </summary>
+public class BasicStatisticsHandler : BaseCommandHandler<BasicStatisticsParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<BasicStatisticsHandler> _logger;
-
     public BasicStatisticsHandler(
         ILoggerFactory loggerFactory,
         ILogger<BasicStatisticsHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (BasicStatisticsParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            if (!opts.TargetColumns.Any())
-            {
-                _logger.LogError("At least one target column must be specified");
-                return 1;
-            }
+            return ExitCodes.InvalidArguments;
+        }
 
-            // Validate and parse statistics types
-            var statistics = new List<StatisticType>();
-            foreach (var statStr in opts.Statistics)
+        return await HandleExceptionAsync(async () =>
+        {
+            var statistics = ParseStatisticTypes(opts.Statistics);
+            if (statistics == null)
             {
-                if (!Enum.TryParse<StatisticType>(statStr, true, out var statType))
-                {
-                    _logger.LogError("Invalid statistic type: {Type}. Valid values are: {ValidValues}",
-                        statStr, string.Join(", ", Enum.GetNames<StatisticType>()));
-                    return 1;
-                }
-                statistics.Add(statType);
-            }
-
-            if (!statistics.Any())
-            {
-                _logger.LogError("At least one statistic type must be specified");
-                return 1;
-            }
-
-            // Validate suffix
-            if (string.IsNullOrWhiteSpace(opts.Suffix))
-            {
-                _logger.LogError("Suffix cannot be empty");
-                return 1;
+                return ExitCodes.InvalidArguments;
             }
 
             var options = new BasicStatisticsOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 TargetColumns = opts.TargetColumns.ToArray(),
                 Statistics = statistics.ToArray(),
                 Suffix = opts.Suffix,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors,
+                DefaultValue = opts.DefaultValue
             };
 
             var taskLogger = _loggerFactory.CreateLogger<BasicStatisticsTask>();
             var task = new BasicStatisticsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
-
-            _logger.LogInformation("Calculating statistics: {Stats} for columns: {Columns}",
+            _logger.LogInformation("Calculating statistics {Stats} for columns {Columns}",
                 string.Join(", ", statistics), string.Join(", ", opts.TargetColumns));
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
+    }
+
+    private List<StatisticType>? ParseStatisticTypes(IEnumerable<string> statDefs)
+    {
+        try
+        {
+            var statistics = new List<StatisticType>();
+
+            foreach (var stat in statDefs)
+            {
+                if (!Enum.TryParse<StatisticType>(stat, true, out var statType))
+                {
+                    _logger.LogError("Invalid statistic type: {Type}. Valid values are: {ValidValues}",
+                        stat, string.Join(", ", Enum.GetNames<StatisticType>()));
+                    return null;
+                }
+                statistics.Add(statType);
+            }
+
+            return statistics;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing stats command");
-            return 1;
+            _logger.LogError(ex, "Error parsing statistic types");
+            return null;
         }
     }
 
-    public string? GetExample() =>
-    "stats -i input.csv -o output.csv -c \"Price,Quantity\" -s \"Mean,Median,StandardDeviation\"";
+    public override string? GetExample() =>
+        "stats -i input.csv -o output.csv -c \"Price,Quantity\" -s \"Mean,Median,StandardDeviation\" --suffix \"_stat\"";
 }

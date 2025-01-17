@@ -1,71 +1,56 @@
-﻿using FilePrepper.CLI.Tools;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
 using FilePrepper.Tasks.RenameColumns;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.RenameColumns;
 
-public class RenameColumnsHandler : ICommandHandler
+public class RenameColumnsHandler : BaseCommandHandler<RenameColumnsParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<RenameColumnsHandler> _logger;
-
     public RenameColumnsHandler(
         ILoggerFactory loggerFactory,
         ILogger<RenameColumnsHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (RenameColumnsParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var renameMap = new Dictionary<string, string>();
             foreach (var mapping in opts.Mappings)
             {
                 var parts = mapping.Split(':');
-                if (parts.Length != 2)
-                {
-                    _logger.LogError("Invalid mapping format: {Mapping}. Expected format: oldName:newName", mapping);
-                    return 1;
-                }
-
-                if (string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
-                {
-                    _logger.LogError("Column names cannot be empty: {Mapping}", mapping);
-                    return 1;
-                }
-
-                renameMap[parts[0]] = parts[1];
+                renameMap[parts[0].Trim()] = parts[1].Trim();
             }
 
             var options = new RenameColumnsOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 RenameMap = renameMap,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<RenameColumnsTask>();
             var task = new RenameColumnsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing rename-columns command");
-            return 1;
-        }
+            _logger.LogInformation("Renaming columns in {Input}. Mappings: {Mappings}",
+                opts.InputPath, string.Join(", ", opts.Mappings));
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "rename-columns -i input.csv -o output.csv -m \"OldName:NewName,Price:Cost\"";
+    public override string? GetExample() =>
+        "rename-columns -i input.csv -o output.csv -m \"OldName:NewName,Price:Cost\"";
 }

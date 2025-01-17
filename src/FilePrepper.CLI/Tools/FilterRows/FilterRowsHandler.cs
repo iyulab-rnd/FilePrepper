@@ -1,44 +1,37 @@
-﻿using FilePrepper.Tasks.FilterRows;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
+using FilePrepper.Tasks.FilterRows;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.FilterRows;
 
-public class FilterRowsHandler : ICommandHandler
+public class FilterRowsHandler : BaseCommandHandler<FilterRowsParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<FilterRowsHandler> _logger;
-
     public FilterRowsHandler(
         ILoggerFactory loggerFactory,
         ILogger<FilterRowsHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (FilterRowsParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var conditions = new List<FilterCondition>();
-            foreach (var condition in opts.Conditions)
-            {
-                var parts = condition.Split(':', 3);
-                if (parts.Length != 3)
-                {
-                    _logger.LogError("Invalid condition format: {Condition}. Expected format: column:operator:value", condition);
-                    return 1;
-                }
 
+            foreach (var condStr in opts.Conditions)
+            {
+                var parts = condStr.Split(':');
                 if (!Enum.TryParse<FilterOperator>(parts[1], true, out var filterOperator))
                 {
-                    _logger.LogError("Invalid filter operator: {Operator}. Valid values are: {ValidValues}",
-                        parts[1], string.Join(", ", Enum.GetNames<FilterOperator>()));
-                    return 1;
+                    _logger.LogError("Invalid filter operator: {Operator}", parts[1]);
+                    return ExitCodes.InvalidArguments;
                 }
 
                 conditions.Add(new FilterCondition
@@ -51,27 +44,25 @@ public class FilterRowsHandler : ICommandHandler
 
             var options = new FilterRowsOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 Conditions = conditions,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<FilterRowsTask>();
             var task = new FilterRowsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing filter-rows command");
-            return 1;
-        }
+            _logger.LogInformation("Filtering rows in {Input} using {Count} conditions",
+                opts.InputPath, conditions.Count);
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "filter-rows -i input.csv -o output.csv -c \"Age:GreaterThan:30,Status:Equals:Active\"";
+    public override string? GetExample() =>
+        "filter-rows -i input.csv -o output.csv -c \"Age:GreaterThan:30,Status:Equals:Active\"";
 }

@@ -1,53 +1,49 @@
 ﻿using FilePrepper.Tasks.ReorderColumns;
 using FilePrepper.Tasks;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.ReorderColumns;
 
-public class ReorderColumnsHandler : ICommandHandler
+public class ReorderColumnsHandler : BaseCommandHandler<ReorderColumnsParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<ReorderColumnsHandler> _logger;
-
     public ReorderColumnsHandler(
         ILoggerFactory loggerFactory,
         ILogger<ReorderColumnsHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (ReorderColumnsParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var options = new ReorderColumnsOption
             {
                 Order = opts.Order.ToList(),
-                Common = opts.GetCommonOptions()
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ReorderColumnsTask>();
             var task = new ReorderColumnsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
+            var context = new TaskContext(options);
 
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            _logger.LogInformation("Reordering columns in {Input}. Order: {Order}",
+                opts.InputPath, string.Join(", ", opts.Order));
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing reorder-columns command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "reorder-columns -i input.csv -o output.csv -o \"ID,Name,Age,Score\"";
+    public override string? GetExample() =>
+        "reorder-columns -i input.csv -o output.csv -o \"ID,Name,Age,Score\"";
 }

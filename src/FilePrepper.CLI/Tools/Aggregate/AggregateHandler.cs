@@ -1,53 +1,85 @@
-﻿using FilePrepper.Tasks.Aggregate;
+﻿using CommandLine;
 using FilePrepper.Tasks;
+using FilePrepper.Tasks.Aggregate;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.Aggregate;
 
-public class AggregateHandler : ICommandHandler
+/// <summary>
+/// CLI의 aggregate 명령어 핸들러
+/// </summary>
+public class AggregateHandler : BaseCommandHandler<AggregateParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<AggregateHandler> _logger;
-
     public AggregateHandler(
         ILoggerFactory loggerFactory,
         ILogger<AggregateHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (AggregateParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            if (!opts.GroupByColumns.Any())
+            return ExitCodes.InvalidArguments;
+        }
+
+        return await HandleExceptionAsync(async () =>
+        {
+            var aggregateColumns = ParseAggregateColumns(opts.AggregateColumns);
+            if (aggregateColumns == null)
             {
-                _logger.LogError("At least one group by column must be specified");
-                return 1;
+                return ExitCodes.InvalidArguments;
             }
 
-            var aggregateColumns = new List<AggregateColumn>();
-            foreach (var aggStr in opts.AggregateColumns)
+            var options = new AggregateOption
             {
-                var parts = aggStr.Split(':');
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
+                GroupByColumns = opts.GroupByColumns.ToArray(),
+                AggregateColumns = aggregateColumns,
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors,
+                AppendToSource = opts.AppendToSource,
+                OutputColumnTemplate = opts.OutputColumnTemplate
+            };
+
+            var taskLogger = _loggerFactory.CreateLogger<AggregateTask>();
+            var task = new AggregateTask(taskLogger);
+            var context = new TaskContext(options);
+
+            _logger.LogInformation("Aggregating data by {Columns} with {Count} aggregate functions",
+                string.Join(", ", opts.GroupByColumns), aggregateColumns.Count);
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
+    }
+
+    private List<AggregateColumn>? ParseAggregateColumns(IEnumerable<string> aggregateDefs)
+    {
+        try
+        {
+            var columns = new List<AggregateColumn>();
+
+            foreach (var agg in aggregateDefs)
+            {
+                var parts = agg.Split(':');
                 if (parts.Length != 3)
                 {
-                    _logger.LogError("Invalid aggregate format: {Aggregate}. Expected format: column:function:output", aggStr);
-                    return 1;
+                    _logger.LogError("Invalid aggregate format: {Aggregate}. Expected format: column:function:output", agg);
+                    return null;
                 }
 
                 if (!Enum.TryParse<AggregateFunction>(parts[1], true, out var function))
                 {
                     _logger.LogError("Invalid aggregate function: {Function}. Valid values are: {ValidValues}",
                         parts[1], string.Join(", ", Enum.GetNames<AggregateFunction>()));
-                    return 1;
+                    return null;
                 }
 
-                aggregateColumns.Add(new AggregateColumn
+                columns.Add(new AggregateColumn
                 {
                     ColumnName = parts[0],
                     Function = function,
@@ -55,43 +87,15 @@ public class AggregateHandler : ICommandHandler
                 });
             }
 
-            var options = new AggregateOption
-            {
-                GroupByColumns = opts.GroupByColumns.ToArray(),
-                AggregateColumns = aggregateColumns,
-                Common = opts.GetCommonOptions()
-            };
-
-            // Handle output options
-            options.Common.Output.AppendToSource = opts.AppendToSource;
-            if (opts.AppendToSource)
-            {
-                if (string.IsNullOrWhiteSpace(opts.OutputColumnTemplate))
-                {
-                    _logger.LogError("Output column template is required when appending to source");
-                    return 1;
-                }
-                options.Common.Output.OutputColumnTemplate = opts.OutputColumnTemplate;
-            }
-
-            var taskLogger = _loggerFactory.CreateLogger<AggregateTask>();
-            var task = new AggregateTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
-
-            return await task.ExecuteAsync(context) ? 0 : 1;
+            return columns;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing aggregate command");
-            return 1;
+            _logger.LogError(ex, "Error parsing aggregate column definitions");
+            return null;
         }
     }
 
-    public string? GetExample() =>
-    "aggregate -i input.csv -o output.csv -g \"Region,Category\" -a \"Sales:Sum:TotalSales,Price:Average:AvgPrice\"";
+    public override string? GetExample() =>
+        "aggregate -i input.csv -o output.csv -g \"Region,Category\" -a \"Sales:Sum:TotalSales,Price:Average:AvgPrice\"";
 }

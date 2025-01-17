@@ -1,66 +1,49 @@
-﻿using FilePrepper.CLI.Tools;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
 using FilePrepper.Tasks.RemoveColumns;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.RemoveColumns;
 
-public class RemoveColumnsHandler : ICommandHandler
+public class RemoveColumnsHandler : BaseCommandHandler<RemoveColumnsParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<RemoveColumnsHandler> _logger;
-
     public RemoveColumnsHandler(
         ILoggerFactory loggerFactory,
         ILogger<RemoveColumnsHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (RemoveColumnsParameters)parameters;
-
-        try
+        if (!ValidateParameters(opts))
         {
-            if (!opts.Columns.Any())
-            {
-                _logger.LogError("At least one column must be specified to remove");
-                return 1;
-            }
+            return ExitCodes.InvalidArguments;
+        }
 
-            // Check for empty or whitespace column names
-            var invalidColumns = opts.Columns.Where(c => string.IsNullOrWhiteSpace(c)).ToList();
-            if (invalidColumns.Any())
-            {
-                _logger.LogError("Column names cannot be empty or whitespace");
-                return 1;
-            }
-
+        return await HandleExceptionAsync(async () =>
+        {
             var options = new RemoveColumnsOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 RemoveColumns = opts.Columns.ToList(),
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<RemoveColumnsTask>();
             var task = new RemoveColumnsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing remove-columns command");
-            return 1;
-        }
+            _logger.LogInformation("Removing columns {Columns} from {Input}",
+                string.Join(", ", opts.Columns), opts.InputPath);
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "remove-columns -i input.csv -o output.csv -c \"TempColumn1,TempColumn2\"";
+    public override string? GetExample() =>
+        "remove-columns -i input.csv -o output.csv -c \"TempColumn1,TempColumn2\"";
 }

@@ -1,29 +1,28 @@
-﻿using FilePrepper.Tasks.DateExtraction;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
+using FilePrepper.Tasks.DateExtraction;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.DateExtraction;
 
-public class DateExtractionHandler : ICommandHandler
+public class DateExtractionHandler : BaseCommandHandler<DateExtractionParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<DateExtractionHandler> _logger;
-
     public DateExtractionHandler(
         ILoggerFactory loggerFactory,
         ILogger<DateExtractionHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (DateExtractionParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var culture = CultureInfo.GetCultureInfo(opts.Culture);
             var extractions = new List<DateColumnExtraction>();
@@ -31,22 +30,14 @@ public class DateExtractionHandler : ICommandHandler
             foreach (var extractStr in opts.Extractions)
             {
                 var parts = extractStr.Split(':');
-                if (parts.Length < 2 || parts.Length > 3)
-                {
-                    _logger.LogError("Invalid extraction format: {Extraction}. Expected format: column:component1,component2[:format]", extractStr);
-                    return 1;
-                }
 
                 var components = new List<DateComponent>();
                 foreach (var comp in parts[1].Split(','))
                 {
-                    if (!Enum.TryParse<DateComponent>(comp, true, out var component))
+                    if (Enum.TryParse<DateComponent>(comp, true, out var component))
                     {
-                        _logger.LogError("Invalid date component: {Component}. Valid values are: {ValidValues}",
-                            comp, string.Join(", ", Enum.GetNames<DateComponent>()));
-                        return 1;
+                        components.Add(component);
                     }
-                    components.Add(component);
                 }
 
                 extractions.Add(new DateColumnExtraction
@@ -61,37 +52,24 @@ public class DateExtractionHandler : ICommandHandler
 
             var options = new DateExtractionOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 Extractions = extractions,
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors,
+                AppendToSource = opts.AppendToSource,
+                OutputColumnTemplate = opts.OutputColumnTemplate
             };
-
-            if (!options.Common.Output.AppendToSource)
-            {
-                options.Common.Output.OutputColumnTemplate = opts.OutputColumnTemplate;
-            }
 
             var taskLogger = _loggerFactory.CreateLogger<DateExtractionTask>();
             var task = new DateExtractionTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (CultureNotFoundException)
-        {
-            _logger.LogError("Invalid culture: {Culture}", opts.Culture);
-            return 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing extract-date command");
-            return 1;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "extract-date -i input.csv -o output.csv -e \"OrderDate:Year,Month,Day:yyyy-MM-dd\"";
+    public override string? GetExample() =>
+        "extract-date -i input.csv -o output.csv -e \"OrderDate:Year,Month,Day:yyyy-MM-dd\" --append-to-source --output-column \"{column}_{component}\"";
 }

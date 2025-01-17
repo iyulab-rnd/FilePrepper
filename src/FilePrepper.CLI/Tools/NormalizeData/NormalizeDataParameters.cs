@@ -1,15 +1,12 @@
 ﻿using CommandLine;
-using FilePrepper.CLI.Tools;
+using FilePrepper.Tasks.NormalizeData;
+using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.NormalizeData;
 
 [Verb("normalize", HelpText = "Normalize numeric columns")]
-public class NormalizeDataParameters : SingleInputParameters
+public class NormalizeDataParameters : BaseColumnParameters
 {
-    [Option('c', "columns", Required = true, Separator = ',',
-        HelpText = "Columns to normalize")]
-    public IEnumerable<string> TargetColumns { get; set; } = Array.Empty<string>();
-
     [Option('m', "method", Required = true,
         HelpText = "Normalization method (MinMax/ZScore)")]
     public string Method { get; set; } = string.Empty;
@@ -23,4 +20,28 @@ public class NormalizeDataParameters : SingleInputParameters
     public double MaxValue { get; set; }
 
     public override Type GetHandlerType() => typeof(NormalizeDataHandler);
+
+    protected override bool ValidateInternal(ILogger logger)
+    {
+        if (!base.ValidateInternal(logger))
+            return false;
+
+        if (!Enum.TryParse<NormalizationMethod>(Method, true, out var method))
+        {
+            logger.LogError("Invalid normalization method: {Method}. Valid values are: {ValidValues}",
+                Method, string.Join(", ", Enum.GetNames<NormalizationMethod>()));
+            return false;
+        }
+
+        if (method == NormalizationMethod.MinMax)
+        {
+            if (MinValue >= MaxValue)
+            {
+                logger.LogError("Min value must be less than max value for MinMax normalization");
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

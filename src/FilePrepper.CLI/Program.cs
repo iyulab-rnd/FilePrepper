@@ -1,8 +1,9 @@
 ﻿using CommandLine;
+using FilePrepper.CLI.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
-using FilePrepper.CLI.Tools;
+
 
 namespace FilePrepper.CLI;
 

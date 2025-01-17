@@ -1,40 +1,32 @@
 ﻿using FilePrepper.Tasks.ValueReplace;
 using FilePrepper.Tasks;
 using Microsoft.Extensions.Logging;
-using FilePrepper.CLI.Tools;
 
 namespace FilePrepper.CLI.Tools.ValueReplace;
 
-public class ValueReplaceHandler : ICommandHandler
+public class ValueReplaceHandler : BaseCommandHandler<ValueReplaceParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<ValueReplaceHandler> _logger;
-
     public ValueReplaceHandler(
         ILoggerFactory loggerFactory,
         ILogger<ValueReplaceHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (ValueReplaceParameters)parameters;
+        if (!ValidateParameters(opts))
+        {
+            return ExitCodes.InvalidArguments;
+        }
 
-        try
+        return await HandleExceptionAsync(async () =>
         {
             var replaceMethods = new List<ColumnReplaceMethod>();
-
             foreach (var replaceStr in opts.ReplaceMethods)
             {
                 var parts = replaceStr.Split(':', 2);
-                if (parts.Length != 2)
-                {
-                    _logger.LogError("Invalid replacement format: {Replace}. Expected format: column:oldValue=newValue[;oldValue2=newValue2]", replaceStr);
-                    return 1;
-                }
-
                 var columnName = parts[0];
                 var replacementRules = parts[1].Split(';');
                 var replacements = new Dictionary<string, string>();
@@ -42,19 +34,7 @@ public class ValueReplaceHandler : ICommandHandler
                 foreach (var rule in replacementRules)
                 {
                     var valueParts = rule.Split('=', 2);
-                    if (valueParts.Length != 2)
-                    {
-                        _logger.LogError("Invalid replacement rule: {Rule}. Expected format: oldValue=newValue", rule);
-                        return 1;
-                    }
-
                     replacements[valueParts[0]] = valueParts[1];
-                }
-
-                if (!replacements.Any())
-                {
-                    _logger.LogError("No valid replacement rules found for column: {Column}", columnName);
-                    return 1;
                 }
 
                 replaceMethods.Add(new ColumnReplaceMethod
@@ -67,26 +47,24 @@ public class ValueReplaceHandler : ICommandHandler
             var options = new ValueReplaceOption
             {
                 ReplaceMethods = replaceMethods,
-                Common = opts.GetCommonOptions()
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<ValueReplaceTask>();
             var task = new ValueReplaceTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
-            return await task.ExecuteAsync(context) ? 0 : 1;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing replace command");
-            return 1;
-        }
+            _logger.LogInformation("Replacing values in {Input}. Rules: {Rules}",
+                opts.InputPath, string.Join(", ", opts.ReplaceMethods));
+
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-    "replace -i input.csv -o output.csv -r \"Status:active=1;inactive=0,Gender:M=Male;F=Female\"";
+    public override string? GetExample() =>
+        "replace -i input.csv -o output.csv -r \"Status:active=1;inactive=0,Gender:M=Male;F=Female\"";
 }

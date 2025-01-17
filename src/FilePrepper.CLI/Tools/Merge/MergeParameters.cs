@@ -1,5 +1,6 @@
 ﻿using CommandLine;
-using FilePrepper.CLI.Tools;
+using FilePrepper.Tasks.Merge;
+using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.Merge;
 
@@ -19,4 +20,42 @@ public class MergeParameters : MultipleInputParameters
     public IEnumerable<string> JoinKeyColumns { get; set; } = Array.Empty<string>();
 
     public override Type GetHandlerType() => typeof(MergeHandler);
+
+    protected override bool ValidateInternal(ILogger logger)
+    {
+        if (!base.ValidateInternal(logger))
+            return false;
+
+        // MergeType 검증
+        if (!Enum.TryParse<Tasks.Merge.MergeType>(MergeType, true, out var mergeType))
+        {
+            logger.LogError("Invalid merge type: {Type}. Valid values are: {ValidValues}",
+                MergeType, string.Join(", ", Enum.GetNames<Tasks.Merge.MergeType>()));
+            return false;
+        }
+
+        // 수평 병합일 때의 추가 검증
+        if (mergeType == Tasks.Merge.MergeType.Horizontal)
+        {
+            // JoinType 검증
+            if (!Enum.TryParse<Tasks.Merge.JoinType>(JoinType, true, out _))
+            {
+                logger.LogError("Invalid join type: {Type}. Valid values are: {ValidValues}",
+                    JoinType, string.Join(", ", Enum.GetNames<Tasks.Merge.JoinType>()));
+                return false;
+            }
+
+            // Join 키 컬럼 검증
+            foreach (var column in JoinKeyColumns)
+            {
+                if (string.IsNullOrWhiteSpace(column))
+                {
+                    logger.LogError("Join key column name cannot be empty");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }

@@ -1,35 +1,46 @@
-﻿using FilePrepper.CLI.Tools;
-using FilePrepper.Tasks;
+﻿using FilePrepper.Tasks;
 using FilePrepper.Tasks.Merge;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.Merge;
 
-public class MergeHandler : ICommandHandler
+public class MergeHandler : BaseCommandHandler<MergeParameters>
 {
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<MergeHandler> _logger;
-
     public MergeHandler(
         ILoggerFactory loggerFactory,
         ILogger<MergeHandler> logger)
+        : base(loggerFactory, logger)
     {
-        _loggerFactory = loggerFactory;
-        _logger = logger;
     }
 
-    public async Task<int> ExecuteAsync(ICommandParameters parameters)
+    public override async Task<int> ExecuteAsync(ICommandParameters parameters)
     {
         var opts = (MergeParameters)parameters;
-        try
+        if (!ValidateParameters(opts))
         {
-            // 옵션 객체 생성 
+            return ExitCodes.InvalidArguments;
+        }
+
+        return await HandleExceptionAsync(async () =>
+        {
+            if (!Enum.TryParse<MergeType>(opts.MergeType, true, out var mergeType))
+            {
+                _logger.LogError("Invalid merge type: {Type}", opts.MergeType);
+                return ExitCodes.InvalidArguments;
+            }
+
+            if (!Enum.TryParse<JoinType>(opts.JoinType, true, out var joinType))
+            {
+                _logger.LogError("Invalid join type: {Type}", opts.JoinType);
+                return ExitCodes.InvalidArguments;
+            }
+
             var options = new MergeOption
             {
                 InputPaths = opts.InputFiles.ToList(),
-                MergeType = Enum.Parse<MergeType>(opts.MergeType, true),
-                JoinType = Enum.Parse<JoinType>(opts.JoinType, true),
-                HasHeader = opts.HasHeader,
+                OutputPath = opts.OutputPath,
+                MergeType = mergeType,
+                JoinType = joinType,
                 JoinKeyColumns = opts.JoinKeyColumns.Select(column =>
                 {
                     if (int.TryParse(column, out int index))
@@ -38,41 +49,23 @@ public class MergeHandler : ICommandHandler
                     }
                     return ColumnIdentifier.ByName(column);
                 }).ToList(),
-                Common = opts.GetCommonOptions()
+                HasHeader = opts.HasHeader,
+                IgnoreErrors = opts.IgnoreErrors
             };
 
             var taskLogger = _loggerFactory.CreateLogger<MergeTask>();
             var task = new MergeTask(taskLogger);
+            var context = new TaskContext(options);
 
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputFiles.First(),
-                OutputPath = opts.OutputPath
-            };
+            _logger.LogInformation("Merging {Count} files using {Type} merge type",
+                opts.InputFiles.Count(), mergeType);
 
-            _logger.LogInformation("Starting merge operation with {Count} files using {Type} merge",
-                opts.InputFiles.Count(), options.MergeType);
-
-            var result = await task.ExecuteAsync(context);
-            if (result)
-            {
-                _logger.LogInformation("Merge operation completed successfully");
-                return ExitCodes.Success;
-            }
-            else
-            {
-                _logger.LogError("Merge operation failed");
-                return ExitCodes.Error;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing merge command");
-            return ExitCodes.Error;
-        }
+            var success = await task.ExecuteAsync(context);
+            return success ? ExitCodes.Success : ExitCodes.Error;
+        });
     }
 
-    public string? GetExample() =>
-        "fileprepper merge file1.csv file2.csv file3.csv -t Vertical -o merged.csv\n" +
-        "fileprepper merge customers1.csv customers2.csv -t Horizontal -k CustomerID -j Left -o merged_customers.csv";
+    public override string? GetExample() =>
+        "merge file1.csv file2.csv -t Vertical -o merged.csv\n" +
+        "merge customers1.csv customers2.csv -t Horizontal -k \"CustomerID\" -j Left -o merged.csv";
 }

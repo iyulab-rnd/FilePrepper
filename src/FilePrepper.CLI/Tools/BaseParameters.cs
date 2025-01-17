@@ -1,154 +1,178 @@
-﻿using CommandLine;
-using FilePrepper.Tasks;
-using Microsoft.Extensions.Logging;
+﻿//using CommandLine;
+//using FilePrepper.Tasks;
+//using Microsoft.Extensions.Logging;
 
-namespace FilePrepper.CLI.Tools;
+//namespace FilePrepper.CLI.Tools;
 
-/// <summary>
-/// 에러 처리와 기타 공통 옵션을 포함하는 기본 클래스
-/// </summary>
-public abstract class BaseParameters : ICommandParameters
-{
-    [Option("ignore-errors", Required = false, Default = false,
-        HelpText = "Whether to ignore errors during processing")]
-    public bool IgnoreErrors { get; set; }
 
-    [Option("default-value", Required = false,
-        HelpText = "Default value to use when encountering errors")]
-    public string? DefaultValue { get; set; }
+///// <summary>
+///// CLI 명령어의 기본 매개변수 클래스
+///// </summary>
+//public abstract class BaseParameters : ICommandParameters
+//{
+//    [Option("has-header", Default = true,
+//        HelpText = "Whether input files have headers")]
+//    public bool HasHeader { get; set; } = true;
 
-    [Option("has-header", Default = true,
-        HelpText = "Whether input files have headers")]
-    public bool HasHeader { get; set; } = true;
+//    [Option("ignore-errors", Required = false, Default = false,
+//        HelpText = "Whether to ignore errors during processing")]
+//    public bool IgnoreErrors { get; set; }
 
-    public abstract Type GetHandlerType();
+//    [Option('o', "output", Required = true,
+//        HelpText = "Output file path")]
+//    public string OutputPath { get; set; } = string.Empty;
 
-    public virtual CommonTaskOptions GetCommonOptions() => new()
-    {
-        ErrorHandling = new()
-        {
-            IgnoreErrors = IgnoreErrors,
-            DefaultValue = DefaultValue
-        }
-    };
+//    public abstract Type GetHandlerType();
 
-    public virtual bool Validate(ILogger logger)
-    {
-        try
-        {
-            // 기본 클래스에서는 항상 true를 반환
-            // 파생 클래스에서 필요한 검증을 구현
-            return true;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Parameter validation error: {ex.Message}");
-            return false;
-        }
-    }
+//    public virtual bool Validate(ILogger logger)
+//    {
+//        if (!ValidateOutputPath(OutputPath, logger))
+//        {
+//            return false;
+//        }
 
-    protected bool ValidateOutputPath(string outputPath, ILogger logger)
-    {
-        if (string.IsNullOrEmpty(outputPath))
-        {
-            logger.LogError("Output path is not specified");
-            return false;
-        }
+//        return ValidateInternal(logger);
+//    }
 
-        var outputDir = Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-        {
-            logger.LogError($"Output directory does not exist: {outputDir}");
-            return false;
-        }
+//    protected virtual bool ValidateInternal(ILogger logger) => true;
 
-        return true;
-    }
+//    protected bool ValidateOutputPath(string outputPath, ILogger logger)
+//    {
+//        if (string.IsNullOrEmpty(outputPath))
+//        {
+//            logger.LogError("Output path is not specified");
+//            return false;
+//        }
 
-    protected bool ValidateInputPath(string inputPath, ILogger logger)
-    {
-        if (string.IsNullOrEmpty(inputPath))
-        {
-            logger.LogError("Input path is not specified");
-            return false;
-        }
+//        var outputDir = Path.GetDirectoryName(outputPath);
+//        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+//        {
+//            logger.LogError($"Output directory does not exist: {outputDir}");
+//            return false;
+//        }
 
-        if (inputPath.Contains("..") || inputPath.Contains("~"))
-        {
-            logger.LogError($"Suspicious input path detected: {inputPath}");
-            return false;
-        }
+//        return true;
+//    }
 
-        if (!File.Exists(inputPath))
-        {
-            logger.LogError($"Input file does not exist: {inputPath}");
-            return false;
-        }
+//    protected bool ValidateInputPath(string inputPath, ILogger logger)
+//    {
+//        if (string.IsNullOrEmpty(inputPath))
+//        {
+//            logger.LogError("Input path is not specified");
+//            return false;
+//        }
 
-        return true;
-    }
-}
+//        if (!File.Exists(inputPath))
+//        {
+//            logger.LogError($"Input file does not exist: {inputPath}");
+//            return false;
+//        }
 
-/// <summary>
-/// 단일 입력 파일을 처리하는 명령어를 위한 기본 클래스
-/// </summary>
-public abstract class SingleInputParameters : BaseParameters
-{
-    [Option('i', "input", Required = true, HelpText = "Input file path")]
-    public string InputPath { get; set; } = string.Empty;
+//        return true;
+//    }
 
-    [Option('o', "output", Required = true, HelpText = "Output file path")]
-    public string OutputPath { get; set; } = string.Empty;
+//    /// <summary>
+//    /// 공통 TaskOption 속성들을 설정합니다.
+//    /// </summary>
+//    protected void ConfigureBaseOption(BaseOption option)
+//    {
+//        option.HasHeader = HasHeader;
+//        option.IgnoreErrors = IgnoreErrors;
+//        option.OutputPath = OutputPath;
+//    }
+//}
 
-    public override bool Validate(ILogger logger)
-    {
-        if (!base.Validate(logger)) return false;
+///// <summary>
+///// 단일 입력 파일을 처리하는 명령어를 위한 기본 클래스
+///// </summary>
+//public abstract class SingleInputParameters : BaseParameters
+//{
+//    [Option('i', "input", Required = true,
+//        HelpText = "Input file path")]
+//    public string InputPath { get; set; } = string.Empty;
 
-        if (!ValidateInputPath(InputPath, logger)) return false;
-        if (!ValidateOutputPath(OutputPath, logger)) return false;
+//    [Option("default-value", Required = false,
+//        HelpText = "Default value to use when encountering errors")]
+//    public string? DefaultValue { get; set; }
 
-        return true;
-    }
+//    [Option("append-to-source", Required = false, Default = false,
+//        HelpText = "Whether to append the result to source columns")]
+//    public bool AppendToSource { get; set; }
 
-    public override CommonTaskOptions GetCommonOptions()
-    {
-        var options = base.GetCommonOptions();
+//    [Option("output-column", Required = false,
+//        HelpText = "Template for the output column name")]
+//    public string? OutputColumnTemplate { get; set; }
 
-        return options;
-    }
-}
+//    protected override bool ValidateInternal(ILogger logger)
+//    {
+//        return ValidateInputPath(InputPath, logger);
+//    }
 
-/// <summary>
-/// 다중 입력 파일을 처리하는 명령어를 위한 기본 클래스
-/// </summary>
-public abstract class MultipleInputParameters : BaseParameters
-{
-    // Option 대신 Value 어트리뷰트 사용하여 위치 기반 인자로 처리
-    [Value(0, Required = true, Min = 2,
-           HelpText = "Input CSV files to merge (minimum 2 files required)")]
-    public IEnumerable<string> InputFiles { get; set; } = [];
+//    protected void ConfigureSingleInputOption(SingleInputOption option)
+//    {
+//        ConfigureBaseOption(option);
+//        option.InputPath = InputPath;
 
-    [Option('o', "output", Required = true, HelpText = "Output file path")]
-    public string OutputPath { get; set; } = string.Empty;
+//        if (option is IDefaultValueOption defaultValueOption)
+//        {
+//            defaultValueOption.DefaultValue = DefaultValue;
+//        }
 
-    public override bool Validate(ILogger logger)
-    {
-        if (!base.Validate(logger)) return false;
+//        if (option is IAppendableOption appendableOption)
+//        {
+//            appendableOption.AppendToSource = AppendToSource;
+//            appendableOption.OutputColumnTemplate = OutputColumnTemplate;
+//        }
+//    }
+//}
 
-        var inputList = InputFiles.Select(path => path.Trim('"')).ToList();
-        if (inputList.Count < 2)
-        {
-            logger.LogError("At least two input files are required");
-            return false;
-        }
+///// <summary>
+///// 다중 입력 파일을 처리하는 명령어를 위한 기본 클래스
+///// </summary>
+//public abstract class MultipleInputParameters : BaseParameters
+//{
+//    [Value(0, Required = true, Min = 2,
+//        HelpText = "Input CSV files to merge (minimum 2 files required)")]
+//    public IEnumerable<string> InputFiles { get; set; } = [];
 
-        foreach (var inputPath in inputList)
-        {
-            if (!ValidateInputPath(inputPath, logger)) return false;
-        }
+//    [Option("default-value", Required = false,
+//        HelpText = "Default value to use when encountering errors")]
+//    public string? DefaultValue { get; set; }
 
-        if (!ValidateOutputPath(OutputPath, logger)) return false;
+//    [Option("append-to-source", Required = false, Default = false,
+//        HelpText = "Whether to append the result to source columns")]
+//    public bool AppendToSource { get; set; }
 
-        return true;
-    }
-}
+//    [Option("output-column", Required = false,
+//        HelpText = "Template for the output column name")]
+//    public string? OutputColumnTemplate { get; set; }
+
+//    protected override bool ValidateInternal(ILogger logger)
+//    {
+//        var inputList = InputFiles.ToList();
+//        if (inputList.Count < 2)
+//        {
+//            logger.LogError("At least two input files are required");
+//            return false;
+//        }
+
+//        return inputList.All(path => ValidateInputPath(path, logger));
+//    }
+
+//    protected void ConfigureMultipleInputOption(MultipleInputOption option)
+//    {
+//        ConfigureBaseOption(option);
+//        option.InputPaths = InputFiles.ToList();
+
+//        if (option is IDefaultValueOption defaultValueOption)
+//        {
+//            defaultValueOption.DefaultValue = DefaultValue;
+//        }
+
+//        if (option is IAppendableOption appendableOption)
+//        {
+//            appendableOption.AppendToSource = AppendToSource;
+//            appendableOption.OutputColumnTemplate = OutputColumnTemplate;
+//        }
+//    }
+//}
