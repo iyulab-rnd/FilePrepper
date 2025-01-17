@@ -95,7 +95,4 @@ public class AggregateHandler : BaseCommandHandler<AggregateParameters>
             return null;
         }
     }
-
-    public override string? GetExample() =>
-        "aggregate -i input.csv -o output.csv -g \"Region,Category\" -a \"Sales:Sum:TotalSales,Price:Average:AvgPrice\"";
 }

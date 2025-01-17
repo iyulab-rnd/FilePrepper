@@ -58,4 +58,8 @@ public class MergeParameters : MultipleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "merge file1.csv file2.csv -t Vertical -o merged.csv\n" +
+        "merge customers1.csv customers2.csv -t Horizontal -k \"CustomerID\" -j Left -o merged.csv";
 }

@@ -50,7 +50,4 @@ public class DataSamplingHandler : BaseCommandHandler<DataSamplingParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "data-sampling -i input.csv -o output.csv -m Random -s 0.3 --seed 42";
 }

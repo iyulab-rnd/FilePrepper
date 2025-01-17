@@ -45,7 +45,4 @@ public class DropDuplicatesHandler : BaseCommandHandler<DropDuplicatesParameters
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "drop-duplicates -i input.csv -o output.csv --subset-only -c \"Name,Department\" --keep-first";
 }

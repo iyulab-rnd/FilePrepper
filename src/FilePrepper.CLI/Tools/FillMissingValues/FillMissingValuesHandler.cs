@@ -65,7 +65,4 @@ public class FillMissingValuesHandler : BaseCommandHandler<FillMissingValuesPara
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "fill-missing -i input.csv -o output.csv -m \"Age:Mean,Name:FixedValue:Unknown,Score:Median\"";
 }

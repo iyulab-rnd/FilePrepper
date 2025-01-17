@@ -49,4 +49,7 @@ public class FilterRowsParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "filter-rows -i input.csv -o output.csv -c \"Age:GreaterThan:30,Status:Equals:Active\"";
 }

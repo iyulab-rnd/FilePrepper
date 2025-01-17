@@ -18,7 +18,7 @@ public interface ICommandHandler
     /// 명령어 사용 예시를 반환합니다.
     /// </summary>
     /// <returns>명령어 사용 예시 문자열. null이면 예시가 없음.</returns>
-    string? GetExample();
+    string? GetExampleCommand();
 }
 
 /// <summary>
@@ -72,7 +72,15 @@ public abstract class BaseCommandHandler<TParameters> : ICommandHandler
 
     public abstract Task<int> ExecuteAsync(ICommandParameters parameters);
 
-    public abstract string? GetExample();
+    public virtual string? GetExampleCommand()
+    {
+        // TParameters의 인스턴스를 생성하여 GetExample() 호출
+        if (Activator.CreateInstance(typeof(TParameters)) is BaseParameters parameters)
+        {
+            return parameters.GetExample();
+        }
+        return null;
+    }
 
     /// <summary>
     /// 공통적인 매개변수 검증을 수행합니다.

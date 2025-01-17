@@ -43,7 +43,4 @@ public class ReorderColumnsHandler : BaseCommandHandler<ReorderColumnsParameters
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "reorder-columns -i input.csv -o output.csv -o \"ID,Name,Age,Score\"";
 }

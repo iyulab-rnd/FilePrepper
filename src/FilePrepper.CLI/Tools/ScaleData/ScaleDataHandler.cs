@@ -53,7 +53,4 @@ public class ScaleDataHandler : BaseCommandHandler<ScaleDataParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "scale -i input.csv -o output.csv -s \"Price:MinMax,Score:Standardization\"";
 }

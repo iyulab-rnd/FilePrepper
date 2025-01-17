@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using FilePrepper.Tasks.ScaleData;
-using FilePrepper.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.CLI.Tools.ScaleData;
@@ -43,4 +42,7 @@ public class ScaleDataParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "scale -i input.csv -o output.csv -s \"Price:MinMax,Score:Standardization\"";
 }

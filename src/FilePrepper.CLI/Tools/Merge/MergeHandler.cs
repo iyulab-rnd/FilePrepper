@@ -64,8 +64,4 @@ public class MergeHandler : BaseCommandHandler<MergeParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "merge file1.csv file2.csv -t Vertical -o merged.csv\n" +
-        "merge customers1.csv customers2.csv -t Horizontal -k \"CustomerID\" -j Left -o merged.csv";
 }

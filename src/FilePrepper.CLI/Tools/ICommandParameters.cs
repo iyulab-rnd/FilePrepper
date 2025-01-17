@@ -29,12 +29,20 @@ public interface IAppendableParameters
 /// </summary>
 public abstract class BaseParameters : ICommandParameters
 {
-    [Option("has-header", Default = true,
-        HelpText = "Whether input files have headers")]
-    public bool HasHeader { get; set; } = true;
+    [Option("has-header", Default = "true",
+        HelpText = "Whether input files have headers (true/false).")]
+    public string HasHeaderOption { get; set; } = "true";
+
+    [Option("no-header", Default = false,
+        HelpText = "Specify that input files do not have headers.")]
+    public bool NoHeader { get; set; }
+
+    public bool HasHeader => NoHeader
+        ? false
+        : (!bool.TryParse(HasHeaderOption, out var result) || result);
 
     [Option("ignore-errors", Required = false, Default = false,
-        HelpText = "Whether to ignore errors during processing")]
+        HelpText = "Whether to ignore errors during processing. Use --ignore-errors=true to enable.")]
     public bool IgnoreErrors { get; set; }
 
     [Option('o', "output", Required = true,
@@ -99,6 +107,8 @@ public abstract class BaseParameters : ICommandParameters
 
         return true;
     }
+
+    public abstract string? GetExample();
 }
 
 /// <summary>

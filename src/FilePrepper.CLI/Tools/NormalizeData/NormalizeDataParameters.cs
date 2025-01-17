@@ -44,4 +44,7 @@ public class NormalizeDataParameters : BaseColumnParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "normalize -i input.csv -o output.csv -c \"Price,Quantity\" -m MinMax --min 0 --max 1";
 }

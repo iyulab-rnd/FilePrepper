@@ -33,4 +33,7 @@ public class ReorderColumnsParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "reorder-columns -i input.csv -o output.csv -o \"ID,Name,Age,Score\"";
 }

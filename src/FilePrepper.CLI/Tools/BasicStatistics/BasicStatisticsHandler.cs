@@ -82,7 +82,4 @@ public class BasicStatisticsHandler : BaseCommandHandler<BasicStatisticsParamete
             return null;
         }
     }
-
-    public override string? GetExample() =>
-        "stats -i input.csv -o output.csv -c \"Price,Quantity\" -s \"Mean,Median,StandardDeviation\" --suffix \"_stat\"";
 }

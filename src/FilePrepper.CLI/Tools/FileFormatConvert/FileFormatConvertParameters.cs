@@ -69,4 +69,7 @@ public class FileFormatConvertParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "convert-format -i input.csv -o output.json -t JSON --pretty";
 }

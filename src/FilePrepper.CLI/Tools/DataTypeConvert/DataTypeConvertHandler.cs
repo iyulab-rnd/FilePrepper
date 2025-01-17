@@ -66,7 +66,4 @@ public class DataTypeConvertHandler : BaseCommandHandler<DataTypeConvertParamete
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "convert-type -i input.csv -o output.csv -c \"Date:DateTime:yyyy-MM-dd,Age:Integer\" --culture en-US";
 }

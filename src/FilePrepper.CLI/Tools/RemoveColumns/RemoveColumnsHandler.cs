@@ -43,7 +43,4 @@ public class RemoveColumnsHandler : BaseCommandHandler<RemoveColumnsParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "remove-columns -i input.csv -o output.csv -c \"TempColumn1,TempColumn2\"";
 }

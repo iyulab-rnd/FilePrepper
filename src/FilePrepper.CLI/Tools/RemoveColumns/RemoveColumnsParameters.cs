@@ -47,4 +47,7 @@ public class RemoveColumnsParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "remove-columns -i input.csv -o output.csv -c \"TempColumn1,TempColumn2\"";
 }

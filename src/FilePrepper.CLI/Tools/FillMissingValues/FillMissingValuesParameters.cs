@@ -55,4 +55,7 @@ public class FillMissingValuesParameters : SingleInputParameters, IAppendablePar
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "fill-missing -i input.csv -o output.csv -m \"Age:Mean,Name:FixedValue:Unknown,Score:Median\"";
 }

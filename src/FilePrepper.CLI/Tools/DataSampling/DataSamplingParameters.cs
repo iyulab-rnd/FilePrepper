@@ -61,4 +61,7 @@ public class DataSamplingParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+    "data-sampling -i input.csv -o output.csv -m Random -s 0.3 --seed 42";
 }

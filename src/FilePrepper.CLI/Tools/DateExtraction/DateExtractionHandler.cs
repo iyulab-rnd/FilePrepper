@@ -69,7 +69,4 @@ public class DateExtractionHandler : BaseCommandHandler<DateExtractionParameters
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "extract-date -i input.csv -o output.csv -e \"OrderDate:Year,Month,Day:yyyy-MM-dd\" --append-to-source --output-column \"{column}_{component}\"";
 }

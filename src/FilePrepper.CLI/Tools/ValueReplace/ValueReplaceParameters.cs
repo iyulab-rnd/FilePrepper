@@ -45,4 +45,7 @@ public class ValueReplaceParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "replace -i input.csv -o output.csv -r \"Status:active=1;inactive=0,Gender:M=Male;F=Female\"";
 }

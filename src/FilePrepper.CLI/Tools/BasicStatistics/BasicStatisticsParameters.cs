@@ -54,4 +54,7 @@ public class BasicStatisticsParameters : BaseColumnParameters, IDefaultValuePara
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "stats -i input.csv -o output.csv -c \"Price,Quantity\" -s \"Mean,Median,StandardDeviation\" --suffix \"_stat\"";
 }

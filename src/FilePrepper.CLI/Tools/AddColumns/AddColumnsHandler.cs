@@ -97,7 +97,4 @@ public class AddColumnsHandler : BaseCommandHandler<AddColumnsParameters>
             return null;
         }
     }
-
-    public override string? GetExample() =>
-        "add-columns -i input.csv -o output.csv -c \"Age=30,City=Seoul\"";
 }

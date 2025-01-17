@@ -62,7 +62,4 @@ public class FilterRowsHandler : BaseCommandHandler<FilterRowsParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "filter-rows -i input.csv -o output.csv -c \"Age:GreaterThan:30,Status:Equals:Active\"";
 }

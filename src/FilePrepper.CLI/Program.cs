@@ -72,15 +72,12 @@ public class Program
             {
                 args =
                 [
-                    "merge",  // 명령어
-            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_test.csv",  // 첫 번째 입력 파일
-            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_train.csv",  // 두 번째 입력 파일
-            "-t",
-            "Vertical",
-            "-o",
-            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_merged.csv",
-            "--has-header",
-            "false"
+                    "merge",
+                    @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_test.csv",
+                    @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_train.csv",
+                    "-t", "Vertical",
+                    "-o", @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_merged.csv",
+                    "--has-header", "false"
                 ];
             }
 #endif
@@ -245,7 +242,7 @@ public class Program
             if (handler == null)
                 return new[] { $"  {_toolCommandName} {command} [options]" };
 
-            var example = handler.GetExample();
+            var example = handler.GetExampleCommand();
             if (example == null)
                 return new[] { $"  {_toolCommandName} {command} [options]" };
 

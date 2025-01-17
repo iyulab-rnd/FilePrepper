@@ -76,4 +76,7 @@ public class ColumnInteractionParameters : SingleInputParameters, IDefaultValueP
 
         return true;
     }
+
+    public override string? GetExample() =>
+    "column-interaction -i sales.csv -o output.csv -s \"Price,Quantity\" -t Multiply -c TotalAmount";
 }

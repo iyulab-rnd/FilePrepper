@@ -52,7 +52,4 @@ public class NormalizeDataHandler : BaseCommandHandler<NormalizeDataParameters>
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "normalize -i input.csv -o output.csv -c \"Price,Quantity\" -m MinMax --min 0 --max 1";
 }

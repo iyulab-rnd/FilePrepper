@@ -48,4 +48,7 @@ public class DropDuplicatesParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+    "drop-duplicates -i input.csv -o output.csv --subset-only -c \"Name,Department\" --keep-first";
 }

@@ -58,7 +58,4 @@ public class ColumnInteractionHandler : BaseCommandHandler<ColumnInteractionPara
             return success ? ExitCodes.Success : ExitCodes.Error;
         });
     }
-
-    public override string? GetExample() =>
-        "column-interaction -i sales.csv -o output.csv -s \"Price,Quantity\" -t Multiply -c TotalAmount";
 }

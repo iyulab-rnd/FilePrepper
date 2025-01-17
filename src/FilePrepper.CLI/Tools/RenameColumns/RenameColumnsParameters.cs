@@ -60,4 +60,7 @@ public class RenameColumnsParameters : SingleInputParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "rename-columns -i input.csv -o output.csv -m \"OldName:NewName,Price:Cost\"";
 }

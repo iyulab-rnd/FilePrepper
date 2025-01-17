@@ -74,4 +74,7 @@ public class AggregateParameters : SingleInputParameters, IAppendableParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+    "aggregate -i input.csv -o output.csv -g \"Region,Category\" -a \"Sales:Sum:TotalSales,Price:Average:AvgPrice\"";
 }

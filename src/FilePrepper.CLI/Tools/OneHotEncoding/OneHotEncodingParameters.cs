@@ -34,4 +34,7 @@ public class OneHotEncodingParameters : BaseColumnParameters
 
         return true;
     }
+
+    public override string? GetExample() =>
+        "one-hot-encoding -i input.csv -o output.csv -c \"Category,Status\" --keep-original";
 }
