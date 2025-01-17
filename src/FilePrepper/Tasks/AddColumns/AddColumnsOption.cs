@@ -1,6 +1,6 @@
 ﻿namespace FilePrepper.Tasks.AddColumns;
 
-public class AddColumnsOption : BaseOption
+public class AddColumnsOption : SingleInputOption
 {
     public Dictionary<string, string> NewColumns { get; set; } = [];
 

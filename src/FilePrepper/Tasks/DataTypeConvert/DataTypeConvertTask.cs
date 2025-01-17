@@ -26,11 +26,11 @@ public class DataTypeConvertTask : BaseTask<DataTypeConvertOption>
                             record[conversion.ColumnName],
                             conversion);
                     }
-                    catch (ValidationException) when (Options.Common.ErrorHandling.IgnoreErrors)
+                    catch (ValidationException) when (Options.IgnoreErrors)
                     {
                         record[conversion.ColumnName] = conversion.DefaultValue ?? string.Empty;
                     }
-                    catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
+                    catch (Exception ex) when (Options.IgnoreErrors)
                     {
                         record[conversion.ColumnName] = conversion.DefaultValue ?? string.Empty;
                         _logger.LogWarning("Error converting value: {Error}", ex.Message);

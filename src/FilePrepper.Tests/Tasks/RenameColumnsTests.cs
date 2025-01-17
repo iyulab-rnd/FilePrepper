@@ -12,7 +12,12 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
     public void Validate_NoMappings_ShouldReturnError()
     {
         // Arrange
-        var option = new RenameColumnsOption { RenameMap = new Dictionary<string, string>() };
+        var option = new RenameColumnsOption 
+        {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
+            RenameMap = new Dictionary<string, string>() 
+        };
 
         // Act
         var errors = option.Validate();
@@ -27,6 +32,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
         // Arrange
         var option = new RenameColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             RenameMap = new Dictionary<string, string>
             {
                 { "OldCol", " " },
@@ -54,6 +61,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
 
         var option = new RenameColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             RenameMap = new Dictionary<string, string>
             {
                 { "OldName", "NewName" }
@@ -61,11 +70,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
         };
 
         var task = new RenameColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -90,6 +95,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
 
         var option = new RenameColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             RenameMap = new Dictionary<string, string>
             {
                 { "NonExist", "X" }
@@ -97,11 +104,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
         };
 
         var task = new RenameColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -126,6 +129,8 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
 
         var option = new RenameColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             RenameMap = new Dictionary<string, string>
             {
                 { "A", "X" },
@@ -135,11 +140,7 @@ public class RenameColumnsTests : TaskBaseTest<RenameColumnsTask>
         };
 
         var task = new RenameColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);

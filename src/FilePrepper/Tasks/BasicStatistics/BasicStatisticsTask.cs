@@ -41,10 +41,10 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
                         {
                             columnData[column].Add(value);
                         }
-                        else if (Options.Common.ErrorHandling.IgnoreErrors &&
-                                Options.Common.ErrorHandling.DefaultValue != null)
+                        else if (Options.IgnoreErrors &&
+                                Options.DefaultValue != null)
                         {
-                            if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out var defaultValue))
+                            if (double.TryParse(Options.DefaultValue, out var defaultValue))
                             {
                                 columnData[column].Add(defaultValue);
                             }
@@ -57,7 +57,7 @@ public class BasicStatisticsTask : BaseTask<BasicStatisticsOption>
                                 column);
                         }
                     }
-                    catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
+                    catch (Exception ex) when (Options.IgnoreErrors)
                     {
                         _logger.LogWarning(ex, "Error processing value for column {Column}", column);
                     }

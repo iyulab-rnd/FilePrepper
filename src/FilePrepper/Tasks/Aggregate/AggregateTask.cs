@@ -16,7 +16,7 @@ public class AggregateTask : BaseTask<AggregateOption>
         var groupResults = await CalculateAggregatesAsync(groups);
 
         // 결과 포맷팅
-        return Options.Common.Output.AppendToSource
+        return Options.AppendToSource
             ? await WriteAppendedResultsAsync(records, groupResults)
             : await WriteAggregateResultsAsync(groupResults);
     }
@@ -105,12 +105,12 @@ public class AggregateTask : BaseTask<AggregateOption>
 
     private string GetAggregateColumnName(AggregateColumn aggCol)
     {
-        if (!Options.Common.Output.AppendToSource)
+        if (!Options.AppendToSource)
         {
             return aggCol.OutputColumnName;
         }
 
-        return Options.Common.Output.OutputColumnTemplate!
+        return Options.OutputColumnTemplate!
             .Replace("{column}", aggCol.ColumnName)
             .Replace("{function}", aggCol.Function.ToString())
             .Replace("{groupBy}", string.Join("_", Options.GroupByColumns));

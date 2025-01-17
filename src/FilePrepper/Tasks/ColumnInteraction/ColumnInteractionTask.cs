@@ -28,15 +28,15 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
                 {
                     record[Options.OutputColumn] = ProcessRecord(record);
                 }
-                catch (ValidationException) when (Options.Common.ErrorHandling.IgnoreErrors)
+                catch (ValidationException) when (Options.IgnoreErrors)
                 {
                     _logger.LogWarning("Error processing row");
-                    record[Options.OutputColumn] = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
+                    record[Options.OutputColumn] = Options.DefaultValue ?? string.Empty;
                 }
-                catch (Exception ex) when (Options.Common.ErrorHandling.IgnoreErrors)
+                catch (Exception ex) when (Options.IgnoreErrors)
                 {
                     _logger.LogWarning("Error processing row: {Error}", ex.Message);
-                    record[Options.OutputColumn] = Options.Common.ErrorHandling.DefaultValue ?? string.Empty;
+                    record[Options.OutputColumn] = Options.DefaultValue ?? string.Empty;
                 }
             }
         });
@@ -121,15 +121,15 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
             {
                 numbers.Add(number);
             }
-            else if (Options.Common.ErrorHandling.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.Common.ErrorHandling.DefaultValue))
+            else if (Options.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.DefaultValue))
             {
-                if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out var defaultNum))
+                if (double.TryParse(Options.DefaultValue, out var defaultNum))
                 {
                     numbers.Add(defaultNum);
                 }
                 else
                 {
-                    throw new ValidationException($"Invalid default value: {Options.Common.ErrorHandling.DefaultValue}",
+                    throw new ValidationException($"Invalid default value: {Options.DefaultValue}",
                         ValidationExceptionErrorCode.General);
                 }
             }
@@ -150,13 +150,13 @@ public class ColumnInteractionTask : BaseTask<ColumnInteractionOption>
             return value;
         }
 
-        if (Options.Common.ErrorHandling.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.Common.ErrorHandling.DefaultValue))
+        if (Options.IgnoreErrors && !string.IsNullOrWhiteSpace(Options.DefaultValue))
         {
-            if (double.TryParse(Options.Common.ErrorHandling.DefaultValue, out _))
+            if (double.TryParse(Options.DefaultValue, out _))
             {
-                return Options.Common.ErrorHandling.DefaultValue;
+                return Options.DefaultValue;
             }
-            throw new ValidationException($"Invalid default value: {Options.Common.ErrorHandling.DefaultValue}",
+            throw new ValidationException($"Invalid default value: {Options.DefaultValue}",
                 ValidationExceptionErrorCode.General);
         }
 

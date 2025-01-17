@@ -38,9 +38,8 @@ public enum JoinType
     Full
 }
 
-public class MergeOption : BaseOption
+public class MergeOption : MultipleInputOption
 {
-    public List<string> InputPaths { get; set; } = new();
     public MergeType MergeType { get; set; } = MergeType.Vertical;
     public JoinType JoinType { get; set; } = JoinType.Inner;
     public List<ColumnIdentifier> JoinKeyColumns { get; set; } = new();

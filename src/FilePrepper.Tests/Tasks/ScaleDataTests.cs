@@ -16,6 +16,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
         // Arrange
         var option = new ScaleDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Col1" },
             ScaleColumns = { }
         };
@@ -33,6 +35,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
         // Arrange
         var option = new ScaleDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Col1" },
             ScaleColumns = { new ScaleColumnOption { ColumnName = "", Method = ScaleMethod.MinMax } }
         };
@@ -57,6 +61,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
 
         var options = new ScaleDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             ScaleColumns = {
                 new ScaleColumnOption {
@@ -67,12 +73,7 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
         };
 
         var task = new ScaleDataTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
+        var context = new TaskContext(options);
         // Act
         bool result = task.Execute(context);
 
@@ -101,6 +102,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
 
         var options = new ScaleDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             ScaleColumns = {
             new ScaleColumnOption {
@@ -111,12 +114,7 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
         };
 
         var task = new ScaleDataTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -168,6 +166,8 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
 
         var options = new ScaleDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             ScaleColumns = {
                 new ScaleColumnOption {
@@ -178,12 +178,7 @@ public class ScaleDataTests : TaskBaseTest<ScaleDataTask>
         };
 
         var task = new ScaleDataTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
+        var context = new TaskContext(options);
         // Act
         bool result = task.Execute(context);
 

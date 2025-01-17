@@ -10,12 +10,13 @@ public enum OperationType
     Custom
 }
 
-public class ColumnInteractionOption : BaseOption
+public class ColumnInteractionOption : SingleInputOption, IDefaultValueOption
 {
     public string[] SourceColumns { get; set; } = Array.Empty<string>();
     public OperationType Operation { get; set; }
     public string OutputColumn { get; set; } = string.Empty;
     public string? CustomExpression { get; set; }
+    public string? DefaultValue { get; set; }
 
     protected override string[] ValidateInternal()
     {
@@ -46,9 +47,9 @@ public class ColumnInteractionOption : BaseOption
             errors.Add("Custom expression cannot be empty when using Custom operation type");
         }
 
-        if (!string.IsNullOrWhiteSpace(Common.ErrorHandling.DefaultValue))
+        if (!string.IsNullOrWhiteSpace(DefaultValue))
         {
-            if (Operation != OperationType.Concat && !double.TryParse(Common.ErrorHandling.DefaultValue, out _))
+            if (Operation != OperationType.Concat && !double.TryParse(DefaultValue, out _))
             {
                 errors.Add("Default value must be a valid number for numeric operations");
             }

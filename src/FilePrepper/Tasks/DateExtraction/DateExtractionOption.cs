@@ -23,9 +23,13 @@ public class DateColumnExtraction
     public string? OutputColumnTemplate { get; set; }
 }
 
-public class DateExtractionOption : BaseOption
+public class DateExtractionOption : SingleInputOption, IAppendableOption
 {
     public List<DateColumnExtraction> Extractions { get; set; } = new();
+
+    // IAppendableOption implementation
+    public bool AppendToSource { get; set; }
+    public string? OutputColumnTemplate { get; set; }
 
     protected override string[] ValidateInternal()
     {
@@ -49,10 +53,15 @@ public class DateExtractionOption : BaseOption
                 errors.Add($"At least one component must be specified for column {extraction.SourceColumn}");
             }
 
-            if (string.IsNullOrWhiteSpace(extraction.OutputColumnTemplate) && !Common.Output.AppendToSource)
+            if (string.IsNullOrWhiteSpace(extraction.OutputColumnTemplate) && !AppendToSource)
             {
                 errors.Add($"Output column template must be specified for column {extraction.SourceColumn} when not appending to source");
             }
+        }
+
+        if (AppendToSource && string.IsNullOrWhiteSpace(OutputColumnTemplate))
+        {
+            errors.Add("OutputColumnTemplate is required when AppendToSource is true");
         }
 
         return [.. errors];

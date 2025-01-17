@@ -11,16 +11,28 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask>
     [Fact]
     public void Validate_NoOrder_ShouldReturnError()
     {
-        var option = new ReorderColumnsOption { Order = new List<string>() };
+        var option = new ReorderColumnsOption
+        {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
+            Order = new List<string>()
+        };
         var errors = option.Validate();
+
         Assert.Contains(errors, e => e.Contains("At least one column must be specified for reordering."));
     }
 
     [Fact]
     public void Validate_WhitespaceInOrder_ShouldReturnError()
     {
-        var option = new ReorderColumnsOption { Order = new List<string> { " " } };
+        var option = new ReorderColumnsOption
+        {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
+            Order = new List<string> { " " }
+        };
         var errors = option.Validate();
+
         Assert.Contains(errors, e => e.Contains("cannot be empty or whitespace"));
     }
 
@@ -37,15 +49,13 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask>
         // Desired order: B,A
         var option = new ReorderColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Order = new List<string> { "B", "A" }
         };
 
         var task = new ReorderColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         bool success = task.Execute(context);
         Assert.True(success);
@@ -70,15 +80,13 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask>
         // Desired order includes a non-existing column "NotHere"
         var option = new ReorderColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Order = new List<string> { "NotHere", "Y" }
         };
 
         var task = new ReorderColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         bool success = task.Execute(context);
         Assert.True(success);
@@ -96,11 +104,13 @@ public class ReorderColumnsTests : TaskBaseTest<ReorderColumnsTask>
 
         var option = new ReorderColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Order = new List<string> { "C", "A" }
         };
 
         var task = new ReorderColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(option) {  InputPath = _testInputPath, OutputPath = _testOutputPath };
+        var context = new TaskContext(option);
 
         bool success = task.Execute(context);
         Assert.True(success);

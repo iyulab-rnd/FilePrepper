@@ -16,10 +16,14 @@ public class AggregateColumn
     public string OutputColumnName { get; set; } = string.Empty;
 }
 
-public class AggregateOption : BaseOption
+public class AggregateOption : SingleInputOption, IAppendableOption
 {
     public string[] GroupByColumns { get; set; } = Array.Empty<string>();
     public List<AggregateColumn> AggregateColumns { get; set; } = new();
+
+    // IAppendableOption implementation
+    public bool AppendToSource { get; set; }
+    public string? OutputColumnTemplate { get; set; }
 
     protected override string[] ValidateInternal()
     {
@@ -46,14 +50,14 @@ public class AggregateOption : BaseOption
                 {
                     errors.Add("Aggregate column name cannot be empty");
                 }
-                if (string.IsNullOrWhiteSpace(col.OutputColumnName) && !Common.Output.AppendToSource)
+                if (string.IsNullOrWhiteSpace(col.OutputColumnName) && !AppendToSource)
                 {
                     errors.Add("Output column name cannot be empty when not appending to source");
                 }
             }
         }
 
-        if (string.IsNullOrWhiteSpace(Common.Output.OutputColumnTemplate) && Common.Output.AppendToSource)
+        if (string.IsNullOrWhiteSpace(OutputColumnTemplate) && AppendToSource)
         {
             errors.Add("Column template is required when appending to source");
         }

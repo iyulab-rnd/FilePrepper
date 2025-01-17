@@ -33,7 +33,7 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
                         newRecord[columnName] = string.Empty;
                     }
 
-                    if (!Options.Common.ErrorHandling.IgnoreErrors)
+                    if (!Options.IgnoreErrors)
                     {
                         throw new ValidationException(
                             $"Failed to parse date value '{record[extraction.SourceColumn]}' for column {extraction.SourceColumn}: {ex.Message}",
@@ -103,14 +103,14 @@ public class DateExtractionTask : BaseTask<DateExtractionOption>
 
     private string GetOutputColumnName(DateColumnExtraction extraction, DateComponent component)
     {
-        if (!Options.Common.Output.AppendToSource)
+        if (!Options.AppendToSource)
         {
             return extraction.OutputColumnTemplate!
                 .Replace("{column}", extraction.SourceColumn)
                 .Replace("{component}", component.ToString());
         }
 
-        return Options.Common.Output.OutputColumnTemplate!
+        return Options.OutputColumnTemplate!
             .Replace("{column}", extraction.SourceColumn)
             .Replace("{component}", component.ToString());
     }

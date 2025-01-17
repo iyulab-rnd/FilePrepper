@@ -24,18 +24,14 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = true,
             SubsetColumnsOnly = false,
-            Common = new CommonTaskOptions()
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -62,18 +58,14 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = false,
             SubsetColumnsOnly = false,
-            Common = new CommonTaskOptions()
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -99,19 +91,15 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = true,
             SubsetColumnsOnly = true,
             TargetColumns = new[] { "Name" },
-            Common = new CommonTaskOptions()
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -133,18 +121,14 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = true,
             SubsetColumnsOnly = false,
-            Common = new CommonTaskOptions()
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -167,17 +151,14 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = true,
             SubsetColumnsOnly = false
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -194,6 +175,8 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
         // Arrange
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SubsetColumnsOnly = true,
             TargetColumns = Array.Empty<string>()
         };
@@ -218,18 +201,15 @@ public class DropDuplicatesTests : TaskBaseTest<DropDuplicatesTask>
 
         var options = new DropDuplicatesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             KeepFirst = true,
             SubsetColumnsOnly = true,
             TargetColumns = new[] { "Department" }
         };
 
         var task = new DropDuplicatesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

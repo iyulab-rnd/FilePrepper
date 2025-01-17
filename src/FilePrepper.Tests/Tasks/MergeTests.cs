@@ -26,16 +26,11 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Horizontal,
             HasHeader = true,
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var context = CreateContext(options);
@@ -64,24 +59,15 @@ public class MergeTests : TaskBaseTest<MergeTask>
     });
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Vertical,
             HasHeader = true,
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = options.InputPaths[0],
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ValidationException>(() => task.ExecuteAsync(context));
@@ -109,16 +95,11 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Vertical,
             HasHeader = true,
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var context = CreateContext(options);
@@ -142,11 +123,7 @@ public class MergeTests : TaskBaseTest<MergeTask>
     private TaskContext CreateContext(MergeOption options)
     {
         // MergeTask는 첫 번째 InputPath를 기본 입력으로 사용
-        return new TaskContext(options)
-        {
-            InputPath = options.InputPaths[0],
-            OutputPath = _testOutputPath
-        };
+        return new TaskContext(options);
     }
 
     private async Task<bool> ExecuteTaskAsync(TaskContext context)
@@ -175,18 +152,14 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Horizontal,
             HasHeader = true
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = await task.ExecuteAsync(context);
@@ -222,18 +195,14 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Horizontal,
             HasHeader = true
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = await task.ExecuteAsync(context);
@@ -271,6 +240,7 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Horizontal,
             JoinType = JoinType.Inner,
@@ -279,12 +249,7 @@ public class MergeTests : TaskBaseTest<MergeTask>
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = await task.ExecuteAsync(context);
@@ -319,18 +284,14 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Vertical,
             HasHeader = false
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = await task.ExecuteAsync(context);
@@ -366,18 +327,14 @@ public class MergeTests : TaskBaseTest<MergeTask>
 
         var options = new MergeOption
         {
+            OutputPath = _testOutputPath,
             InputPaths = new List<string> { _testInputPath, secondInputPath },
             MergeType = MergeType.Horizontal,
             HasHeader = false
         };
 
         var task = new MergeTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = await task.ExecuteAsync(context);

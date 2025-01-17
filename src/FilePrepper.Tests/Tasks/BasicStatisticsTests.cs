@@ -41,6 +41,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
 
         var options = new BasicStatisticsOption
         {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             Statistics = new[] {
                 StatisticType.Mean,
@@ -49,12 +51,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -90,6 +87,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
 
         var options = new BasicStatisticsOption
         {
+            InputPath = outlierDataPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             Statistics = new[] {
                 StatisticType.ZScore,
@@ -98,11 +97,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = outlierDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -139,6 +134,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         // Arrange
         var options = new BasicStatisticsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             Statistics = new[] {
                 StatisticType.Mean,
@@ -150,12 +147,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -182,23 +174,21 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         // Arrange
         var options = new BasicStatisticsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             Statistics = new[] { StatisticType.ZScore }
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
-        // Act
-        bool result = task.Execute(context);
+        var context = new TaskContext(options);
 
         // Assert
+        bool result = task.Execute(context);
+
+        // Act
         Assert.True(result);
+
         string[] lines = File.ReadAllLines(_testOutputPath);
         Assert.Contains("Score_stat_ZScore", lines[0]);
 
@@ -220,17 +210,14 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         // Arrange
         var options = new BasicStatisticsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             Statistics = new[] { StatisticType.PercentRank }
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -255,6 +242,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         // Arrange
         var options = new BasicStatisticsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             Statistics = new[] {
                 StatisticType.Q1,
@@ -264,11 +253,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -301,6 +286,8 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         // Arrange
         var options = new BasicStatisticsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score", "Value" },
             Statistics = new[] {
                 StatisticType.Mean,
@@ -310,11 +297,7 @@ public class BasicStatisticsTests : TaskBaseTest<BasicStatisticsTask>
         };
 
         var task = new BasicStatisticsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

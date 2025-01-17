@@ -40,7 +40,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
             // If a value is invalid (including "NaN" after our new parser logic), 
             // we either skip or use DefaultValue, depending on IgnoreErrors.
             if (rec.ValidateNumericColumns(numericCols, out var numericValues,
-                Options.Common.ErrorHandling.IgnoreErrors, Options.Common.ErrorHandling.DefaultValue))
+                Options.IgnoreErrors, Options.DefaultValue))
             {
                 // Gather values for stats
                 foreach (var col in numericCols)
@@ -79,7 +79,7 @@ public class NormalizeDataTask : BaseTask<NormalizeDataOption>
         foreach (var rec in records)
         {
             if (rec.ValidateNumericColumns(numericCols, out var numericValues,
-                Options.Common.ErrorHandling.IgnoreErrors, Options.Common.ErrorHandling.DefaultValue))
+                Options.IgnoreErrors, Options.DefaultValue))
             {
                 foreach (var col in numericCols)
                 {

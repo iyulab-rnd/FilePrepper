@@ -24,6 +24,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
         // Arrange
         var options = new AggregateOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -32,22 +34,12 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Sum
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
         };
 
         var task = new AggregateTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -66,6 +58,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
         // Arrange
         var options = new AggregateOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region", "Product" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -74,22 +68,12 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Average
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = "Avg_{column}_for_{groupBy}"
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = "Avg_{column}_for_{groupBy}"
         };
 
         var task = new AggregateTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -106,6 +90,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
         // Arrange
         var options = new AggregateOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -114,14 +100,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Sum
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = ""  // 빈 템플릿
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = ""  // 빈 템플릿
         };
 
         // Act
@@ -137,6 +117,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
         // Arrange
         var options = new AggregateOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -149,22 +131,12 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Average
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
         };
 
         var task = new AggregateTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -190,6 +162,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
 
         var options = new AggregateOption
         {
+            InputPath = mixedDataPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region", "Category" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -202,23 +176,12 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Average
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
         };
 
         var task = new AggregateTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = mixedDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -246,6 +209,8 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
 
         var options = new AggregateOption
         {
+            InputPath = emptyGroupPath,
+            OutputPath = _testOutputPath,
             GroupByColumns = new[] { "Region" },
             AggregateColumns = new List<AggregateColumn>
             {
@@ -254,22 +219,12 @@ public class AggregateTests : TaskBaseTest<AggregateTask>
                     Function = AggregateFunction.Sum
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                Output = new OutputOptions
-                {
-                    AppendToSource = true,
-                    OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
-                }
-            }
+            AppendToSource = true,
+            OutputColumnTemplate = "{column}_{function}_by_{groupBy}"
         };
 
         var task = new AggregateTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = emptyGroupPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

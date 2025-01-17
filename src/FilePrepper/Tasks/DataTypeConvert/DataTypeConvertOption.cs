@@ -20,12 +20,13 @@ public class ColumnTypeConversion
     public bool IgnoreCase { get; set; } = true;
 }
 
-public class DataTypeConvertOption : BaseOption
+public class DataTypeConvertOption : SingleInputOption, IDefaultValueOption
 {
     private static readonly string[] TrueValues = ["true", "yes", "1", "y", "t"];
     private static readonly string[] FalseValues = ["false", "no", "0", "n", "f"];
 
     public List<ColumnTypeConversion> Conversions { get; set; } = new();
+    public string? DefaultValue { get; set; }
 
     protected override string[] ValidateInternal()
     {

@@ -27,17 +27,15 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.TSV,
             HasHeader = true,
             Encoding = Encoding.UTF8
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -56,17 +54,14 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.PSV,
             HasHeader = true
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -85,16 +80,14 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.JSON,
             PrettyPrint = true
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -117,6 +110,8 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.XML,
             RootElementName = "data",
             ItemElementName = "record",
@@ -124,11 +119,7 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -151,16 +142,14 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.CSV,
             Encoding = Encoding.UTF32
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -178,16 +167,14 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.CSV,
             HasHeader = false
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -205,6 +192,8 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.XML,
             RootElementName = "",
             ItemElementName = "invalid name"
@@ -231,6 +220,8 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
         // Arrange
         var options = new FileFormatConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.CSV,
             Delimiter = "|"
         };
@@ -251,16 +242,14 @@ public class FileFormatConvertTests : TaskBaseTest<FileFormatConvertTask>
 
         var options = new FileFormatConvertOption
         {
+            InputPath = emptyInputPath,
+            OutputPath = _testOutputPath,
             TargetFormat = FileFormat.JSON,
             PrettyPrint = true
         };
 
         var task = new FileFormatConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = emptyInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

@@ -31,18 +31,15 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = sourceColumns,
             Operation = operation,
             OutputColumn = outputColumn
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -71,25 +68,16 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Value1",  // 이미 존재하는 컬럼명
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-
+        var context = new TaskContext(options);
         // Act & Assert
         var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
         Assert.Equal("Output column already exists: Value1", exception.Message);
@@ -107,25 +95,16 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
 
         var options = new ColumnInteractionOption
         {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Sum",
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
-
+        var context = new TaskContext(options);
         // Act & Assert
         var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
         Assert.Contains("Invalid numeric value", exception.Message);
@@ -140,18 +119,15 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Text1", "Text2" },
             Operation = OperationType.Concat,
             OutputColumn = "CombinedText"
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -170,6 +146,8 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2", "Value3" },
             Operation = OperationType.Custom,
             OutputColumn = "CustomCalc",
@@ -177,12 +155,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -212,26 +185,17 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
 
         var options = new ColumnInteractionOption
         {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Sum",
-            Common = new CommonTaskOptions 
-            { 
-                ErrorHandling = new ErrorHandlingOptions()
-                {
-                    IgnoreErrors = true,
-                    DefaultValue = "0"
-                }
-            },
+            IgnoreErrors = true,
+            DefaultValue = "0"
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -258,26 +222,17 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
 
         var options = new ColumnInteractionOption
         {
+            InputPath = divisionByZeroPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Divide,
             OutputColumn = "Division",
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions()
-                {
-                    IgnoreErrors = true,
-                    DefaultValue = "-1"
-                }
-            }
+            IgnoreErrors = true,
+            DefaultValue = "-1"
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = divisionByZeroPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -300,6 +255,8 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = null,
             Operation = OperationType.Add,
             OutputColumn = "Result"
@@ -318,6 +275,8 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = Array.Empty<string>(),
             Operation = OperationType.Add,
             OutputColumn = "Result"
@@ -336,6 +295,8 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Custom,
             OutputColumn = "Result",
@@ -355,16 +316,12 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2" },
             Operation = OperationType.Add,
             OutputColumn = "Result",
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions()
-                {
-                    DefaultValue = "not-a-number"
-                }
-            }
+            DefaultValue = "not-a-number"
         };
 
         // Act
@@ -380,18 +337,15 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2", "Value3" },
             Operation = OperationType.Add,
             OutputColumn = "Total"
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -411,6 +365,8 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         // Arrange
         var options = new ColumnInteractionOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             SourceColumns = new[] { "Value1", "Value2", "Value3" },
             Operation = OperationType.Custom,
             OutputColumn = "ComplexCalc",
@@ -418,12 +374,7 @@ public class ColumnInteractionTests : TaskBaseTest<ColumnInteractionTask>
         };
 
         var task = new ColumnInteractionTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

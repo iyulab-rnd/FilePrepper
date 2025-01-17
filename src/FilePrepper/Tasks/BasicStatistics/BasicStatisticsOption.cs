@@ -16,10 +16,11 @@ public enum StatisticType
 }
 
 
-public class BasicStatisticsOption : BaseColumnOption
+public class BasicStatisticsOption : BaseColumnOption, IDefaultValueOption
 {
     public StatisticType[] Statistics { get; set; } = [];
     public string Suffix { get; set; } = "_stat";
+    public string? DefaultValue { get; set; }
 
     protected override string[] ValidateInternal()
     {

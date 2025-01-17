@@ -88,3 +88,67 @@ public abstract class BaseParameters : ICommandParameters
         return true;
     }
 }
+
+/// <summary>
+/// 단일 입력 파일을 처리하는 명령어를 위한 기본 클래스
+/// </summary>
+public abstract class SingleInputParameters : BaseParameters
+{
+    [Option('i', "input", Required = true, HelpText = "Input file path")]
+    public string InputPath { get; set; } = string.Empty;
+
+    [Option('o', "output", Required = true, HelpText = "Output file path")]
+    public string OutputPath { get; set; } = string.Empty;
+
+    public override bool Validate(ILogger logger)
+    {
+        if (!base.Validate(logger)) return false;
+
+        if (!ValidateInputPath(InputPath, logger)) return false;
+        if (!ValidateOutputPath(OutputPath, logger)) return false;
+
+        return true;
+    }
+
+    public override CommonTaskOptions GetCommonOptions()
+    {
+        var options = base.GetCommonOptions();
+
+        return options;
+    }
+}
+
+/// <summary>
+/// 다중 입력 파일을 처리하는 명령어를 위한 기본 클래스
+/// </summary>
+public abstract class MultipleInputParameters : BaseParameters
+{
+    // Option 대신 Value 어트리뷰트 사용하여 위치 기반 인자로 처리
+    [Value(0, Required = true, Min = 2,
+           HelpText = "Input CSV files to merge (minimum 2 files required)")]
+    public IEnumerable<string> InputFiles { get; set; } = [];
+
+    [Option('o', "output", Required = true, HelpText = "Output file path")]
+    public string OutputPath { get; set; } = string.Empty;
+
+    public override bool Validate(ILogger logger)
+    {
+        if (!base.Validate(logger)) return false;
+
+        var inputList = InputFiles.Select(path => path.Trim('"')).ToList();
+        if (inputList.Count < 2)
+        {
+            logger.LogError("At least two input files are required");
+            return false;
+        }
+
+        foreach (var inputPath in inputList)
+        {
+            if (!ValidateInputPath(inputPath, logger)) return false;
+        }
+
+        if (!ValidateOutputPath(OutputPath, logger)) return false;
+
+        return true;
+    }
+}

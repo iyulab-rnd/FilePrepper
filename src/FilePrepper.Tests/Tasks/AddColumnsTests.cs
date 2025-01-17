@@ -18,15 +18,13 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
         // Arrange
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = new Dictionary<string, string> { { "Age", "30" } }
         };
 
         var task = new AddColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -46,6 +44,8 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
         // Arrange
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = new Dictionary<string, string>()
         };
 
@@ -63,6 +63,8 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
         // Arrange
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = null
         };
 
@@ -108,25 +110,17 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
 
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = new Dictionary<string, string>
         {
             { "Name", "Duplicate" }  // Trying to add existing column
         },
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var task = new AddColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act & Assert
         var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
@@ -146,26 +140,18 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
 
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = new Dictionary<string, string>
         {
             { "Name", "Duplicate" },  // Duplicate column
             { "Age", "30" }          // New column
         },
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = true
-                }
-            }
+            IgnoreErrors = true  // Changed to true
         };
 
         var task = new AddColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         var result = task.Execute(context);
@@ -185,6 +171,8 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
         // Arrange
         var options = new AddColumnsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             NewColumns = new Dictionary<string, string>
             {
                 { "Age", "30" },
@@ -194,11 +182,7 @@ public class AddColumnsTests : TaskBaseTest<AddColumnsTask>
         };
 
         var task = new AddColumnsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

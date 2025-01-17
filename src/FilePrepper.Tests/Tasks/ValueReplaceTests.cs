@@ -16,6 +16,8 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
         // Arrange
         var option = new ValueReplaceOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             ReplaceMethods = new List<ColumnReplaceMethod>()
         };
@@ -33,6 +35,8 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
         // Arrange
         var option = new ValueReplaceOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             ReplaceMethods = new List<ColumnReplaceMethod>
             {
@@ -57,6 +61,8 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
         // Arrange
         var option = new ValueReplaceOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             ReplaceMethods = new List<ColumnReplaceMethod>
             {
@@ -89,6 +95,8 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
 
         var options = new ValueReplaceOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name", "Status" },
             ReplaceMethods = new List<ColumnReplaceMethod>
             {
@@ -106,11 +114,7 @@ public class ValueReplaceTests : TaskBaseTest<ValueReplaceTask>
         };
 
         var task = new ValueReplaceTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

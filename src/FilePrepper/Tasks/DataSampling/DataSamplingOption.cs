@@ -7,7 +7,7 @@ public enum SamplingMethod
     Stratified     // 층화 샘플링 (특정 컬럼 기준)
 }
 
-public class DataSamplingOption : BaseOption
+public class DataSamplingOption : SingleInputOption
 {
     public SamplingMethod Method { get; set; } = SamplingMethod.Random;
     public double SampleSize { get; set; }

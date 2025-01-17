@@ -19,13 +19,15 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
             "5,,,88.0"
         );
     }
-    
+
     [Fact]
     public void Execute_WithFixedValue_ShouldSucceed()
     {
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -39,11 +41,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -71,6 +69,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Age" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -83,11 +83,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -111,6 +107,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -123,12 +121,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -151,6 +144,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -163,11 +158,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -190,6 +181,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -202,11 +195,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -229,6 +218,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -241,11 +232,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -261,7 +248,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         string[] lines = File.ReadAllLines(_testOutputPath);
         Assert.Equal("2,Mary,25,", lines[2]); // 뒤의 값으로 채워져야 함
     }
-    
+
     [Fact]
     public void Execute_WithLinearInterpolation_ShouldSucceed()
     {
@@ -275,6 +262,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Age" },
             FillMethods = new List<ColumnFillMethod>
         {
@@ -287,11 +276,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -317,6 +302,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             // 여기에 명시적으로 TargetColumns를 지정
             TargetColumns = new[] { "Value" },
             FillMethods = new List<ColumnFillMethod>
@@ -331,11 +318,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -358,6 +341,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name", "Age" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -376,11 +361,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -404,6 +385,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>()
         };
@@ -427,6 +410,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -458,6 +443,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         // Arrange
         var options = new FillMissingValuesOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -495,6 +482,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 
         var options = new FillMissingValuesOption
         {
+            InputPath = testFile,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -504,21 +493,11 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
                     Method = FillMethod.Mean
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    DefaultValue = "0"
-                }
-            }
+            DefaultValue = "0"
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = testFile,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -552,6 +531,8 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
 
         var options = new FillMissingValuesOption
         {
+            InputPath = testFile,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Value" },
             FillMethods = new List<ColumnFillMethod>
             {
@@ -565,11 +546,7 @@ public class FillMissingValuesTests : TaskBaseTest<FillMissingValuesTask>
         };
 
         var task = new FillMissingValuesTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = testFile,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

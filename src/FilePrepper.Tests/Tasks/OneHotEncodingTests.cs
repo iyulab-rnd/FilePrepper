@@ -16,6 +16,8 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
         // Arrange
         var option = new OneHotEncodingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = Array.Empty<string>()
         };
 
@@ -42,17 +44,15 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
 
         var option = new OneHotEncodingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Color" },
             DropFirst = false,
             KeepOriginalColumns = false
         };
 
         var task = new OneHotEncodingTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool result = task.Execute(context);
@@ -87,17 +87,15 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
 
         var option = new OneHotEncodingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Color" },
             DropFirst = false,
             KeepOriginalColumns = true
         };
 
         var task = new OneHotEncodingTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -129,17 +127,15 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
 
         var option = new OneHotEncodingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Color" },
             DropFirst = true,
             KeepOriginalColumns = false
         };
 
         var task = new OneHotEncodingTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -174,17 +170,15 @@ public class OneHotEncodingTests : TaskBaseTest<OneHotEncodingTask>
 
         var option = new OneHotEncodingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Color", "Shape" },
             DropFirst = false,
             KeepOriginalColumns = false
         };
 
         var task = new OneHotEncodingTask(_mockLogger.Object);
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);

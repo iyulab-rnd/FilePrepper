@@ -1,6 +1,6 @@
 ﻿namespace FilePrepper.Tasks;
 
-public abstract class BaseColumnOption : BaseOption
+public abstract class BaseColumnOption : SingleInputOption
 {
     public string[] TargetColumns { get; set; } = [];
 

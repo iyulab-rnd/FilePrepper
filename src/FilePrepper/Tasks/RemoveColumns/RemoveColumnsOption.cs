@@ -1,6 +1,6 @@
 ﻿namespace FilePrepper.Tasks.RemoveColumns;
 
-public class RemoveColumnsOption : BaseOption
+public class RemoveColumnsOption : SingleInputOption
 {
     /// <summary>
     /// List of columns to remove

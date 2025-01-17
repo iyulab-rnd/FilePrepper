@@ -18,12 +18,12 @@ public class AddColumnsTask : BaseTask<AddColumnsOption>
 
         if (duplicateColumns.Any())
         {
-            var error = $"Duplicate column names found: {string.Join(", ", duplicateColumns)}";
-            _logger.LogError(error);
+            var warning = $"Duplicate column names found: {string.Join(", ", duplicateColumns)}";
+            _logger.LogWarning(warning);
 
-            if (!Options.Common.ErrorHandling.IgnoreErrors)
+            if (!Options.IgnoreErrors)
             {
-                throw new ValidationException(error, ValidationExceptionErrorCode.General);
+                throw new ValidationException(warning, ValidationExceptionErrorCode.General);
             }
 
             // IgnoreErrors가 true인 경우, 중복되지 않은 컬럼만 추가

@@ -9,7 +9,7 @@ public enum FileFormat
     XML
 }
 
-public class FileFormatConvertOption : BaseOption
+public class FileFormatConvertOption : SingleInputOption
 {
     public FileFormat TargetFormat { get; set; }
     public Encoding? Encoding { get; set; }

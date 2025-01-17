@@ -1,6 +1,6 @@
 ﻿namespace FilePrepper.Tasks.RenameColumns;
 
-public class RenameColumnsOption : BaseOption
+public class RenameColumnsOption : SingleInputOption
 {
     /// <summary>
     /// Dictionary mapping original column names to new column names.

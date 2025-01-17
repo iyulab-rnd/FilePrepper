@@ -1,6 +1,6 @@
 ﻿namespace FilePrepper.Tasks.DropDuplicates;
 
-public class DropDuplicatesOption : BaseOption
+public class DropDuplicatesOption : SingleInputOption
 {
     /// <summary>
     /// 첫 번째 발견된 중복 데이터를 유지할지 여부

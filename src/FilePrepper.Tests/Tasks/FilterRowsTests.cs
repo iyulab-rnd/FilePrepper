@@ -27,6 +27,8 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         // Arrange
         var options = new FilterRowsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             Conditions = new List<FilterCondition>
             {
@@ -40,12 +42,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         };
 
         var task = new FilterRowsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -64,6 +61,8 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         // Arrange
         var options = new FilterRowsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             Conditions = new List<FilterCondition>
             {
@@ -77,11 +76,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         };
 
         var task = new FilterRowsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -100,6 +95,8 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         // Arrange
         var options = new FilterRowsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             Conditions = new List<FilterCondition>
         {
@@ -113,12 +110,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         };
 
         var task = new FilterRowsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -139,6 +131,8 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         // Arrange
         var options = new FilterRowsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Score" },
             Conditions = new List<FilterCondition>
             {
@@ -152,12 +146,7 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         };
 
         var task = new FilterRowsTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -175,6 +164,8 @@ public class FilterRowsTests : TaskBaseTest<FilterRowsTask>
         // Arrange
         var options = new FilterRowsOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = new[] { "Name" },
             Conditions = new List<FilterCondition>()
         };

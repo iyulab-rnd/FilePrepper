@@ -2,7 +2,7 @@
 
 namespace FilePrepper.Tasks.ReorderColumns;
 
-public class ReorderColumnsOption : BaseOption
+public class ReorderColumnsOption : SingleInputOption
 {
     /// <summary>
     /// Desired column order.

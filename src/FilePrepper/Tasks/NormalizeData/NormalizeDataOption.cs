@@ -19,18 +19,14 @@ public enum NormalizationMethod
 /// <summary>
 /// Options for data normalization (e.g., which columns to normalize, which method, etc.)
 /// </summary>
-public class NormalizeDataOption : BaseColumnOption
+public class NormalizeDataOption : BaseColumnOption, IDefaultValueOption
 {
-    /// <summary>
-    /// Normalization method: MinMax or ZScore
-    /// </summary>
     public NormalizationMethod Method { get; set; } = NormalizationMethod.MinMax;
-
-    /// <summary>
-    /// For Min-Max scaling, the target range [MinValue, MaxValue]
-    /// </summary>
     public double MinValue { get; set; } = 0.0;
     public double MaxValue { get; set; } = 1.0;
+
+    // IDefaultValueOption implementation
+    public string? DefaultValue { get; set; }
 
     protected override string[] ValidateInternal()
     {

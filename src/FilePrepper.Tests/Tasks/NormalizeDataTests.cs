@@ -16,6 +16,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
         // Arrange
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             TargetColumns = Array.Empty<string>() // no columns
         };
 
@@ -32,6 +34,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
         // Arrange
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" },
             MinValue = 5,
@@ -51,6 +55,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
         // Arrange
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" },
             MinValue = 0,
@@ -80,6 +86,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" },
             MinValue = 0,
@@ -88,11 +96,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -124,17 +128,15 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.ZScore,
             TargetColumns = new[] { "Score" }
         };
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -164,6 +166,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" },
             MinValue = 0,
@@ -172,11 +176,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -204,17 +204,15 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.ZScore,
             TargetColumns = new[] { "Score" }
         };
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -242,27 +240,19 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" },
             MinValue = 0,
             MaxValue = 1,
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = true,
-                    DefaultValue = "0"
-                }
-            }
+            IgnoreErrors = true,
+            DefaultValue = "0"
         };
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);
@@ -293,6 +283,8 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var option = new NormalizeDataOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = NormalizationMethod.MinMax,
             TargetColumns = new[] { "Score" }, // This column doesn't exist in CSV
             MinValue = 0,
@@ -301,11 +293,7 @@ public class NormalizeDataTests : TaskBaseTest<NormalizeDataTask>
 
         var task = new NormalizeDataTask(_mockLogger.Object);
 
-        var context = new TaskContext(option)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(option);
 
         // Act
         bool success = task.Execute(context);

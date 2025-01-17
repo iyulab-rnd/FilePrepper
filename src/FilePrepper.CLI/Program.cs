@@ -67,14 +67,21 @@ public class Program
         try
         {
 #if DEBUG
-            //args = new string[7];
-            //args[0] = "merge";
-            //args[1] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_test.csv";
-            //args[2] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_train.csv";
-            //args[3] = "-t";
-            //args[4] = "Vertical";
-            //args[5] = "-o";
-            //args[6] = "D:\\data\\ML-Research\\CNC 머신 AI 데이터셋\\03. Dataset_CNC\\dataset\\CNC 학습통합데이터_1209\\X_merged.csv";
+            if (args.Length == 0)
+            {
+                args =
+                [
+                    "merge",  // 명령어
+            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_test.csv",  // 첫 번째 입력 파일
+            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_train.csv",  // 두 번째 입력 파일
+            "-t",
+            "Vertical",
+            "-o",
+            @"D:\data\ML-Research\CNC 머신 AI 데이터셋\03. Dataset_CNC\dataset\CNC 학습통합데이터_1209\X_merged.csv",
+            "--has-header",
+            "false"
+                ];
+            }
 #endif
 
             // 도움말 표시 시에는 로깅 레벨을 Error로 설정

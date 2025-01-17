@@ -4,7 +4,8 @@ using Microsoft.Extensions.Logging;
 
 namespace FilePrepper.Tasks;
 
-public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
+public abstract class BaseTask<TOption> : ITask 
+    where TOption : class, ITaskOption
 {
     protected readonly ILogger _logger;
     protected List<string> _originalHeaders = [];
@@ -44,7 +45,7 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
                 var errorMessage = $"Validation errors in {Name} task: {string.Join(", ", validationErrors)}";
                 _logger.LogError(errorMessage);
 
-                if (!Options.Common.ErrorHandling.IgnoreErrors)
+                if (!Options.IgnoreErrors)
                 {
                     throw new ValidationException(errorMessage, ValidationExceptionErrorCode.General);
                 }
@@ -68,33 +69,8 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
     {
         var errorList = new List<string>();
 
-        // 옵션 검증
+        // 옵션 검증만 수행
         errorList.AddRange(context.Options.Validate());
-
-        // 파일 존재 여부 검증
-        if (!File.Exists(context.InputPath))
-        {
-            errorList.Add($"Input file not found: {context.InputPath}");
-        }
-
-        // 필수 컬럼 검증 (MergeTask 제외)
-        var requiredColumns = GetRequiredColumns().ToList();
-        if (requiredColumns.Any() && !(this is MergeTask))
-        {
-            try
-            {
-                var headers = GetFileHeaders(context.InputPath);
-                var missingColumns = requiredColumns.Where(col => !headers.Contains(col)).ToList();
-                if (missingColumns.Any())
-                {
-                    errorList.Add($"Required columns not found: {string.Join(", ", missingColumns)}");
-                }
-            }
-            catch (Exception ex)
-            {
-                errorList.Add($"Error reading file headers: {ex.Message}");
-            }
-        }
 
         // Task별 추가 검증
         errorList.AddRange(ValidateTaskSpecific(context));
@@ -120,7 +96,7 @@ public abstract class BaseTask<TOption> : ITask where TOption : BaseOption
 
     private void HandleTaskException(Exception ex)
     {
-        if (Options.Common.ErrorHandling.IgnoreErrors)
+        if (Options.IgnoreErrors)
         {
             _logger.LogWarning(ex, "Error ignored in {TaskName} task: {Message}", Name, ex.Message);
             return;

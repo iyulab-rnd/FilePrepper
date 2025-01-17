@@ -38,17 +38,15 @@ public class AddColumnsHandler : ICommandHandler
 
             var options = new AddColumnsOption
             {
+                InputPath = opts.InputPath,
+                OutputPath = opts.OutputPath,
                 NewColumns = columns,
                 Common = opts.GetCommonOptions()
             };
 
             var taskLogger = _loggerFactory.CreateLogger<AddColumnsTask>();
             var task = new AddColumnsTask(taskLogger);
-            var context = new TaskContext(options)
-            {
-                InputPath = opts.InputPath,
-                OutputPath = opts.OutputPath
-            };
+            var context = new TaskContext(options);
 
             return await task.ExecuteAsync(context) ? 0 : 1;
         }

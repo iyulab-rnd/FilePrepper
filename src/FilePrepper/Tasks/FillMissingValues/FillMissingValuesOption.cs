@@ -18,9 +18,12 @@ public class ColumnFillMethod
     public string? FixedValue { get; set; }
 }
 
-public class FillMissingValuesOption : BaseColumnOption
+public class FillMissingValuesOption : BaseColumnOption, IDefaultValueOption, IAppendableOption
 {
     public List<ColumnFillMethod> FillMethods { get; set; } = new();
+    public string? DefaultValue { get; set; }
+    public bool AppendToSource { get; set; }
+    public string? OutputColumnTemplate { get; set; }
 
     public override string[] Validate()
     {
@@ -60,8 +63,11 @@ public class FillMissingValuesOption : BaseColumnOption
             {
                 errors.Add($"Fixed value must be specified for column {method.ColumnName}");
             }
+        }
 
-            // (예전 코드에서 TargetColumns에 컬럼을 추가하던 부분은 Validate()로 옮겼음)
+        if (AppendToSource && string.IsNullOrWhiteSpace(OutputColumnTemplate))
+        {
+            errors.Add("OutputColumnTemplate is required when AppendToSource is true");
         }
 
         return [.. errors];

@@ -29,17 +29,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = 0.5,  // 50%
             Seed = 42  // 재현성을 위한 시드값
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -57,17 +55,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Systematic,
             SampleSize = 3,
             SystematicInterval = 3
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -84,6 +80,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Stratified,
             SampleSize = 0.5,  // 각 그룹에서 50%
             StratifyColumn = "Category",
@@ -91,12 +89,7 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -119,17 +112,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = 3,  // 정확히 3개 샘플
             Seed = 42
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -144,8 +135,20 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
     public void Execute_WithSeed_ShouldProduceSameResults()
     {
         // Arrange
-        var options = new DataSamplingOption
+        var options1 = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
+            Method = SamplingMethod.Random,
+            SampleSize = 5,
+            Seed = 42
+        };
+
+        var outputPath2 = Path.GetTempFileName();
+        var options2 = new DataSamplingOption
+        {
+            InputPath = _testInputPath,
+            OutputPath = outputPath2,
             Method = SamplingMethod.Random,
             SampleSize = 5,
             Seed = 42
@@ -154,17 +157,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         var task1 = new DataSamplingTask(_mockLogger.Object);
         var task2 = new DataSamplingTask(_mockLogger.Object);
 
-        var outputPath2 = Path.GetTempFileName();
-        var context1 = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
-        var context2 = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = outputPath2
-        };
+        var context1 = new TaskContext(options1);
+        var context2 = new TaskContext(options2);
 
         // Act
         task1.Execute(context1);
@@ -185,17 +179,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = 100, // 데이터 크기보다 큰 값
             Seed = 42
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -212,17 +204,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = 0.01, // 매우 작은 비율
             Seed = 42
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -239,6 +229,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = -1  // 잘못된 샘플 크기
         };
@@ -256,6 +248,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Stratified,
             SampleSize = 0.5,
             StratifyColumn = null  // 층화 컬럼이 지정되지 않음
@@ -274,6 +268,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Systematic,
             SampleSize = 0.5,
             SystematicInterval = null  // 간격이 지정되지 않음
@@ -292,6 +288,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         // Arrange
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Systematic,
             SampleSize = 0.5,
             SystematicInterval = 0  // 잘못된 간격
@@ -313,17 +311,15 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
 
         var options = new DataSamplingOption
         {
+            InputPath = emptyInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Random,
             SampleSize = 0.5,
             Seed = 42
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = emptyInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -353,6 +349,8 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
 
         var options = new DataSamplingOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Method = SamplingMethod.Stratified,
             SampleSize = 0.5,
             StratifyColumn = "Category",
@@ -360,11 +358,7 @@ public class DataSamplingTests : TaskBaseTest<DataSamplingTask>
         };
 
         var task = new DataSamplingTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = stratifiedInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);

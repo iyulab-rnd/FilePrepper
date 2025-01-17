@@ -23,6 +23,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
         {
             new()
@@ -36,11 +38,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act & Assert
         Assert.True(task.Execute(context));
@@ -60,6 +58,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
         {
             new()
@@ -72,11 +72,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act & Assert
         Assert.True(task.Execute(context));
@@ -109,6 +105,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
 
             var options = new DataTypeConvertOption
             {
+                InputPath = _testInputPath,
+                OutputPath = _testOutputPath,
                 Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -121,11 +119,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
             };
 
             var task = new DataTypeConvertTask(_mockLogger.Object);
-            var context = new TaskContext(options)
-            {
-                InputPath = cultureDataPath,
-                OutputPath = _testOutputPath
-            };
+            var context = new TaskContext(options);
 
             // Act & Assert
             Assert.True(task.Execute(context));
@@ -147,6 +141,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -158,11 +154,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -185,6 +177,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -197,11 +191,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -231,6 +221,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
 
         var options = new DataTypeConvertOption
         {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -240,21 +232,11 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
                     DefaultValue = "-1"
                 }
             },
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = true
-                }
-            }
+            IgnoreErrors = true
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -282,6 +264,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
 
         var options = new DataTypeConvertOption
         {
+            InputPath = invalidDataPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
         {
             new()
@@ -290,21 +274,11 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
                 TargetType = DataType.Integer
             }
         },
-            Common = new CommonTaskOptions
-            {
-                ErrorHandling = new ErrorHandlingOptions
-                {
-                    IgnoreErrors = false
-                }
-            }
+            IgnoreErrors = false
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = invalidDataPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act & Assert
         var exception = Assert.Throws<ValidationException>(() => task.Execute(context));
@@ -320,6 +294,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -336,11 +312,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            InputPath = _testInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -362,6 +334,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
 
         var options = new DataTypeConvertOption
         {
+            InputPath = emptyInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -374,12 +348,7 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         };
 
         var task = new DataTypeConvertTask(_mockLogger.Object);
-        var context = new TaskContext(options)
-        {
-            
-            InputPath = emptyInputPath,
-            OutputPath = _testOutputPath
-        };
+        var context = new TaskContext(options);
 
         // Act
         bool result = task.Execute(context);
@@ -399,6 +368,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -423,6 +394,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
@@ -447,6 +420,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>()
         };
 
@@ -463,6 +438,8 @@ public class DataTypeConvertTests : TaskBaseTest<DataTypeConvertTask>
         // Arrange
         var options = new DataTypeConvertOption
         {
+            InputPath = _testInputPath,
+            OutputPath = _testOutputPath,
             Conversions = new List<ColumnTypeConversion>
             {
                 new()
